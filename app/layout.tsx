@@ -1,16 +1,18 @@
+
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
+import { Roboto } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "@mui/material";
+import theme from "@/theme";
+import StoreProvider from "./StoreProvider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const roboto = Roboto({
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: "Medlink Jobs",
@@ -22,10 +24,18 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+ 
   return (
-    <html lang="en">
-      <body >
-        {children}
+    <html lang="en" className={roboto.className}>
+      <body>
+        <ThemeProvider theme={theme}>
+          <StoreProvider>
+            <AppRouterCacheProvider>
+              {children}
+            
+            </AppRouterCacheProvider>
+          </StoreProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
