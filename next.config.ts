@@ -29,6 +29,15 @@ const nextConfig: NextConfig = {
       process.env.REACT_APP_HOSPITAL_FLOW_GRAPHQL_MAIN_URL,
   },
   /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'staged-medlink-files.s3.ap-south-1.amazonaws.com',
+
+      },
+    ],
+  },
 };
 
 export default nextConfig;

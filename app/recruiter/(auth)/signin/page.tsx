@@ -24,15 +24,14 @@ import theme from "@/theme";
 import { useRouter } from "next/navigation";
 import { useAppDispatch } from "@/lib/utils/reduxHooks";
 import { login } from "@/redux/features/authSlice";
-import { getProfile } from "@/lib/api/jobseeker/queries";
-import { storeJobseekerProfile } from "@/redux/features/jobseekerProfileSlice";
 import { openSnackbar } from "@/redux/features/snackbarSlice";
 import UseLoading from "../../../../hooks/UseLoading";
 import { configureRecruiter } from "@/lib/utils/commonFunctions";
 import { loginSchema } from "@/schema/recruiterSchema";
+import { storeRecruiterProfile } from "@/redux/features/recruiterProfileSlice";
+import { getRecruiterProfile } from "@/lib/api/recruiter/queries";
 
-;
-const SignIn = () => { 
+const SignIn = () => {
   const EmailForm = useForm({
     defaultValues: {
       email: undefined,
@@ -65,16 +64,23 @@ const SignIn = () => {
       });
       const user = await getCurrentUser();
       dispatch(login(user));
-      const userData = await getProfile();
-      if (userData) {
-        dispatch(storeJobseekerProfile(userData));
-      }
-      dispatch(openSnackbar({ message: "Login Successful", severity: false }));
+      try {
+        const userData = await getRecruiterProfile();
+        if (userData) {
+          dispatch(storeRecruiterProfile(userData?.getRecruiterProfile));
+        }
+        dispatch(
+          openSnackbar({ message: "Login Successful", severity: false })
+        );
 
-      if (user && !userData) {
-        router.push("/registration");
-      } else {
-        router.push("/jobseeker/home");
+        if (user && !userData) {
+          router.push("/recruiter/registration");
+        } else {
+          router.push("/recruiter/home");
+        }
+      } catch (error) {
+        console.error(error);
+        router.push("/recruiter/registration");
       }
     } catch (error) {
       dispatch(

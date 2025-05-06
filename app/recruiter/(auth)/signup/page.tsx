@@ -18,7 +18,6 @@ import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Link from "next/link";
 import { signUp } from "aws-amplify/auth";
-import { Amplify, type ResourcesConfig } from "aws-amplify";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppDispatch } from "@/lib/utils/reduxHooks";
 import { openSnackbar } from "@/redux/features/snackbarSlice";

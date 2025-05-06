@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState } from "react";
 import { getAppliedJobs } from "@/lib/api/jobseeker/queries";
 import UseLoading from "@/hooks/UseLoading";
