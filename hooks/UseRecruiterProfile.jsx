@@ -17,9 +17,7 @@ const UseRecruiterProfile = () => {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [error, setError] = useState(null);
-  const profile = useAppSelector(
-    (state) => state.recruiterProfile?.profileDetails
-  );
+  const profile = useAppSelector((state) => state);
 
   const getUser = useCallback(async () => {
     try {
@@ -33,9 +31,11 @@ const UseRecruiterProfile = () => {
   }, []);
   const getProfile = useCallback(async () => {
     try {
-      const data = await getRecruiterProfile();
-      dispatch(storeRecruiterProfile(data?.getMyProfile));
-      return data?.getProfile;
+      const data = await getRecruiterProfile().then((res) => {
+        return res?.getMyProfile;
+      });
+      dispatch(storeRecruiterProfile(data));
+      return data;
     } catch (error) {
       console.error("Error fetching user profile details:", error);
     }
@@ -48,12 +48,13 @@ const UseRecruiterProfile = () => {
         if (user) {
           setAuthenticated(true);
 
-          const profileDetails = !profile && (await getProfile());
+          const profileDetails = await getProfile();
 
           dispatch(completeRegistration(true));
           if (profileDetails || profile) {
-            // await fetchAndStoreRecruiters(profileDetails.company_id);
+
           } else {
+            console.log(profileDetails, profile, "profiles");
             router.push("/recruiter/registration");
           }
         } else {
