@@ -1,12 +1,14 @@
-import PersonalFolderList from '@/components/recruiter/PersonalFoldeList'
+"use client"
+import Footer from '@/components/recruiter/Footer'
+// import PersonalFoldeList from '@/components/recruiter/PersonalFoldeList'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-  <PersonalFolderList />  
+  <Footer />  
     </div>
   )
 }
 
-export default page
+export default page;

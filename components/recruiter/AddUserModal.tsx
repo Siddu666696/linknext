@@ -1,208 +1,246 @@
 "use client";
 
+import {
+  AddHospitalUser,
+  updateHospitalUser,
+} from "@/lib/api/recruiter/mutations";
+import { openSnackbar } from "@/redux/features/snackbarSlice";
 import { adduserSchema } from "@/schema/recruiterSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Box, Button, Grid, InputLabel, Modal, TextField, Typography, Checkbox, FormControlLabel, FormHelperText } from "@mui/material";
-import React from "react";
-import { Controller, useForm } from "react-hook-form";
-
+import {
+  Box,
+  Button,
+  InputLabel,
+  Modal,
+  TextField,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+  FormHelperText,
+} from "@mui/material";
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 
 const style = {
-  position: "absolute",
+  position: "absolute" as const,
   left: "50%",
   transform: "translate(-50%, 10%)",
   background: "white",
-  width: "90%", // Responsive width
+  width: "90%",
   maxWidth: 540,
   p: 4,
   borderRadius: 2,
   boxShadow: 24,
 };
 
-const AddUserModal = ({isOpen,close,open}) => {
+interface AddUserModalProps {
+  isOpen: (key: string) => boolean;
+  open: (key: string) => void;
+  close: (key: string) => void;
+  onUserAddedOrUpdated: (newUser: any) => void;
+  editingUser: any;
+}
+
+const AddUserModal: React.FC<AddUserModalProps> = ({
+  isOpen,
+  close,
+  onUserAddedOrUpdated,
+  editingUser,
+}) => {
+  const dispatch = useDispatch();
+  const router = useRouter();
   const {
     handleSubmit,
-    control,
     setValue,
-    getValues,
     register,
+    watch,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(adduserSchema),
-    defaultValues: {
-      email: "",
-      fullName: "",
-      phone: "",
-      permissions: [],
-    },
+    defaultValues: { email: "", fullName: "", phone: "", permissions: [] },
   });
 
-  // const { isOpen, close, open } = UseModalManager();
-
-  const onSubmit = (data: any) => {
-    close("adduser");
-  };
-
-  const handleOpen = () => open("adduser");
+  const permissions: string[] = watch("permissions", []);
 
   const togglePermission = (permission: string) => {
-    const currentPermissions = getValues("permissions");
-    if (currentPermissions.includes(permission)) {
-      setValue("permissions", currentPermissions.filter((p) => p !== permission));
-    } else {
-      setValue("permissions", [...currentPermissions, permission]);
+    const current = permissions;
+    setValue(
+      "permissions",
+      current.includes(permission)
+        ? current.filter((p) => p !== permission)
+        : [...current, permission]
+    );
+  };
+  const isModalOpen = isOpen("adduser");
+  useEffect(() => {
+    if (isModalOpen) {
+      if (editingUser) {
+        const perms = [];
+        if (editingUser.postajob) perms.push("jobPosting");
+        if (editingUser.searchcandidate) perms.push("jra");
+  
+        reset({
+          email: editingUser.subuser || "",
+          fullName: editingUser.name || "",
+          phone: editingUser.phone || "",
+          permissions: perms,
+        });
+      } else {
+        reset({
+          email: "",
+          fullName: "",
+          phone: "",
+          permissions: [],
+        });
+      }
+    }
+  }, [isModalOpen, editingUser, reset]);
+
+  const onSubmit = async (data: any) => {
+    const payload = {
+      name: data.fullName,
+      email: data.email,
+      phoneNumber: data.phone,
+      accessJobPosting: data.permissions.includes("jobPosting"),
+      accessResumeDB: data.permissions.includes("jra"),
+      huID: editingUser?.huID, 
+    };
+
+    try {
+      if (editingUser) {
+        await updateHospitalUser(payload);
+        dispatch(
+          openSnackbar({
+            message: "User updated successfully",
+            severity: false,
+          })
+        );
+        
+      } else {
+        const result = await AddHospitalUser(payload);
+        dispatch(
+          openSnackbar({ message: "User added successfully", severity: false })
+        );
+      }
+
+      onUserAddedOrUpdated(payload);
+      close("adduser");
+      reset();
+    } catch (error) {
+      console.error("User save error:", error);
+      dispatch(
+        openSnackbar({ message: "Failed to save user", severity: true })
+      );
     }
   };
 
   return (
-    <div>
-     
-<Grid container width={"100%"}>
-      <Modal
-        open={isOpen("adduser")}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Add User
-            </Typography>
-            <Box>
-              <InputLabel>Email Address</InputLabel>
-              <TextField
-                {...register("email")}
-                sx={{ my: 1 }}
-                size="small"
-                fullWidth
-                placeholder="Please Enter Valid Email"
-                error={!!errors.email}
-                helperText={errors.email?.message}
+    <Modal open={isOpen("adduser")} onClose={() => close("adduser")}>
+      <Box sx={style}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Typography variant="h6" mb={2}>
+            Add User
+          </Typography>
+
+          <InputLabel>Email Address</InputLabel>
+          <TextField
+            {...register("email")}
+            fullWidth
+            size="small"
+            placeholder="Please enter a valid email"
+            disabled={!!editingUser}
+            error={!!errors.email}
+            helperText={errors.email?.message}
+            sx={{ mb: 2 }}
+          />
+
+          <InputLabel>Full Name</InputLabel>
+          <TextField
+            {...register("fullName")}
+            fullWidth
+            size="small"
+            placeholder="Please enter name"
+            error={!!errors.fullName}
+            helperText={errors.fullName?.message}
+            sx={{ mb: 2 }}
+          />
+
+          <InputLabel>Mobile Number</InputLabel>
+          <TextField
+            type="text"
+            placeholder="Enter Mobile Number"
+            fullWidth
+            size="small"
+            sx={{ my: 1 }}
+            autoComplete="off"
+            inputMode="text"
+            inputProps={{
+              maxLength: 10,
+            }}
+            disabled={!!editingUser}
+            {...register("phone")}
+            onKeyDown={(e) => {
+              const isValidKey =
+                /^\d$/.test(e.key) ||
+                [
+                  "Backspace",
+                  "Delete",
+                  "Tab",
+                  "ArrowLeft",
+                  "ArrowRight",
+                ].includes(e.key) ||
+                ((e.ctrlKey || e.metaKey) &&
+                  ["v", "c", "a", "x"].includes(e.key.toLowerCase()));
+              if (!isValidKey) {
+                e.preventDefault();
+              }
+            }}
+            onPaste={(e) => {
+              const paste = e.clipboardData.getData("text");
+              if (!/^\d+$/.test(paste)) {
+                e.preventDefault();
+              }
+            }}
+            error={!!errors.phone}
+            helperText={errors?.phone?.message}
+          />
+          <Typography>Select Permissions</Typography>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={permissions.includes("jobPosting")}
+                onChange={() => togglePermission("jobPosting")}
               />
-
-              <InputLabel>Full Name</InputLabel>
-              <TextField
-                {...register("fullName")}
-                sx={{ my: 1 }}
-                size="small"
-                fullWidth
-                placeholder="Please Enter Name"
-                error={!!errors.fullName}
-                helperText={errors.fullName?.message}
+            }
+            label="Access to Job Posting"
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={permissions.includes("jra")}
+                onChange={() => togglePermission("jra")}
               />
+            }
+            label="Access to JRA"
+          />
+          {errors.permissions && (
+            <FormHelperText error>{errors.permissions.message}</FormHelperText>
+          )}
 
-              <InputLabel sx={{ marginBottom: 1 }}>
-                Mobile Number<span style={{ color: "red" }}>*</span>
-              </InputLabel>
-              <Grid container>
-                <Grid item xs={2} md={2}>
-                  <TextField
-                    variant="outlined"
-                    defaultValue="+91"
-                    disabled
-                    fullWidth
-                    size="small"
-                    sx={{
-                      [`& fieldset`]: {
-                        borderRadius: "4px 0px 0px 4px !important",
-                      },
-                    }}
-                    InputProps={{
-                      sx: {
-                        ".MuiOutlinedInput-input": {
-                          padding: "10.5px 14px",
-                        },
-                      },
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={10} md={10}>
-                  <Controller
-                    name="phone"
-                    control={control}
-                    render={({ field: { onChange, value } }) => (
-                      <TextField
-                        value={value}
-                        onChange={onChange}
-                        sx={{
-                          [`& fieldset`]: {
-                            borderRadius: "0px 4px 4px 0px !important",
-                          },
-                        }}
-                        InputProps={{
-                          sx: {
-                            ".MuiOutlinedInput-input": {
-                              padding: "10.5px 14px",
-                            },
-                          },
-                        }}
-                        size="small"
-                        fullWidth
-                        type="text"
-                        autoComplete="off"
-                        placeholder="Enter Mobile Number"
-                        inputProps={{ maxLength: 10 }}
-                        onKeyDown={(e) => {
-                          const isValidKey =
-                            /^\d$/.test(e.key) ||
-                            ["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight"].includes(e.key) ||
-                            ((e.ctrlKey || e.metaKey) && ["v", "c", "a", "x"].includes(e.key.toLowerCase()));
-                          if (!isValidKey) e.preventDefault();
-                        }}
-                        onPaste={(e) => {
-                          const paste = e.clipboardData.getData("text");
-                          if (!/^\d+$/.test(paste)) e.preventDefault();
-                        }}
-                        error={!!errors?.phone}
-                        helperText={errors?.phone?.message}
-                      />
-                    )}
-                  />
-                </Grid>
-              </Grid>
-
-              <Typography>Please select the Permission</Typography>
-              <Box sx={{ display: "flex", flexDirection: "row", gap: 3, my: 2 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={() => togglePermission("jobPosting")}
-                      checked={getValues("permissions").includes("jobPosting")}
-                    />
-                  }
-                  label={<Typography sx={{ color: "#395987" }}>Access to Job Posting</Typography>}
-                />
-              </Box>
-              <Box sx={{ display: "flex", flexDirection: "row", gap: 3, my: 2 }}>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      onChange={() => togglePermission("jra")}
-                      checked={getValues("permissions").includes("jra")}
-                    />
-                  }
-                  label={<Typography sx={{ color: "#395987" }}>Access to JRA</Typography>}
-                />
-              </Box>
-
-              {errors.permissions && (
-                <FormHelperText error>{errors.permissions?.message}</FormHelperText>
-              )}
-            </Box>
-
-            <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 2 }}>
-              <Button variant="outlined" onClick={() => close("adduser")}>
-                Cancel
-              </Button>
-              <Button variant="contained" color="primary" type="submit">
-                Submit
-              </Button>
-            </Box>
-          </form>
-        </Box>
-      </Modal>
-      </Grid>
-    </div>
+          <Box mt={3} display="flex" justifyContent="flex-end" gap={2}>
+            <Button variant="outlined" onClick={() => close("adduser")}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained">
+              Submit
+            </Button>
+          </Box>
+        </form>
+      </Box>
+    </Modal>
   );
 };
 

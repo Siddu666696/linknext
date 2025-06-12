@@ -1,7 +1,7 @@
 "use client";
 
 import { addHRFolder } from "@/lib/api/recruiter/mutations";
-import { adduserSchema } from "@/schema/recruiterSchema";
+import { addfolderSchema } from "@/schema/recruiterSchema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Box,
@@ -46,7 +46,7 @@ const CreateFolderModal = ({
     handleSubmit,
     reset,
   } = useForm({
-    resolver: yupResolver(adduserSchema),
+    resolver: yupResolver(addfolderSchema),
     defaultValues: {
       fullName: "",
     },
@@ -54,7 +54,7 @@ const CreateFolderModal = ({
 
   const onSubmit = async (data: any) => {
     try {
-      const response = await addHRFolder(data.fullName);
+      const response = await addHRFolder(data.fullName);      
       if (response?.addHRFolder) {
         dispatch(
           openSnackbar({

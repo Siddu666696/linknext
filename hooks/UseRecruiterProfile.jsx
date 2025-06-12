@@ -52,9 +52,7 @@ const UseRecruiterProfile = () => {
 
           dispatch(completeRegistration(true));
           if (profileDetails || profile) {
-
           } else {
-            console.log(profileDetails, profile, "profiles");
             router.push("/recruiter/registration");
           }
         } else {

@@ -1,13 +1,14 @@
 "use client";
-import React from "react";
-import RecruiterProfile from "./RecruiterProfile";
-import CompanyProfile from "./CompanyProfile";
-import { Box, Breadcrumbs, Typography } from "@mui/material";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
-const CompanySettings = () => {
+import { Box, Breadcrumbs, Grid, Typography } from "@mui/material";
+import React from "react";
+import ManageJobs from "./ManageJobs";
+import ManageJobsList from "./ManageJobsList";
+import Link from "next/link";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { useRouter } from "next/navigation";
+
+const ManageJobsnResponses = () => {
   const router = useRouter();
 
   const handleClick =
@@ -15,9 +16,10 @@ const CompanySettings = () => {
       event.preventDefault();
       router.push(path);
     };
+
   return (
-    <div>
-      <Box sx={{ my: 8, mx: 30 }}>
+    <>
+      <Box sx={{ my: 8, mx: 20 }}>
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize="small" />}
           aria-label="breadcrumb"
@@ -29,16 +31,20 @@ const CompanySettings = () => {
           >
             Dashboard
           </Link>
-          <Typography color="primary">Company Settings</Typography>
+          <Typography color="primary">Account Settings</Typography>
         </Breadcrumbs>
       </Box>
+      <Grid container spacing={2} sx={{ p: { xs: 2, md: 3 }, my: 5 }}>
+        <Grid item xs={6} md={4}>
+          <ManageJobsList />
+        </Grid>
 
-      <Box sx={{ overflowY: "auto", width: "100%" }}>
-        <RecruiterProfile />
-        <CompanyProfile />
-      </Box>
-    </div>
+        <Grid item xs={12} md={8}>
+          <ManageJobs />
+        </Grid>
+      </Grid>
+    </>
   );
 };
 
-export default CompanySettings;
+export default ManageJobsnResponses;

@@ -1,15 +1,13 @@
-"use client";
 import React from "react";
-import RecruiterProfile from "./RecruiterProfile";
-import CompanyProfile from "./CompanyProfile";
-import { Box, Breadcrumbs, Typography } from "@mui/material";
+import PostaJob from "./PostaJob";
+import { Box, Breadcrumbs, Grid, Typography } from "@mui/material";
+import PrefillJobsForm from "./PrefillJobsForm";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { useRouter } from "next/navigation";
 
-const CompanySettings = () => {
+const JobModule = () => {
   const router = useRouter();
-
   const handleClick =
     (path: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
       event.preventDefault();
@@ -17,28 +15,32 @@ const CompanySettings = () => {
     };
   return (
     <div>
-      <Box sx={{ my: 8, mx: 30 }}>
+      <Box sx={{ my: 10, mx: 12 }}>
         <Breadcrumbs
           separator={<NavigateNextIcon fontSize="small" />}
           aria-label="breadcrumb"
         >
           <Link
+            underline="hover"
             color="inherit"
             href="/recruiter/recruiterdashboard"
             onClick={handleClick("/recruiter/recruiterdashboard")}
           >
             Dashboard
           </Link>
-          <Typography color="primary">Company Settings</Typography>
+          <Typography color="primary">Post A Job</Typography>
         </Breadcrumbs>
       </Box>
-
-      <Box sx={{ overflowY: "auto", width: "100%" }}>
-        <RecruiterProfile />
-        <CompanyProfile />
-      </Box>
+      <Grid container>
+        <Grid item xs={8}>
+          <PostaJob />
+        </Grid>
+        <Grid item xs={4}>
+          <PrefillJobsForm />
+        </Grid>
+      </Grid>
     </div>
   );
 };
 
-export default CompanySettings;
+export default JobModule;

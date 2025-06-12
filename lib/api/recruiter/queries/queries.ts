@@ -134,10 +134,10 @@ export const getHospital_Query = /* GraphQL */ `
   }
 `;
 export const downloadDocument_Query = /* GraphQL */ `
-query downloadDocument ($url: String!){
-  downloadDocument (url:$url)
-}`
-;
+  query downloadDocument($url: String!) {
+    downloadDocument(url: $url)
+  }
+`;
 export const getFolders_Query = /* GraphQL */ `
   query getFolders {
     getFolders {
@@ -145,10 +145,227 @@ export const getFolders_Query = /* GraphQL */ `
       name
       profileCount
       userName
-  }
-  getFolderWiseProfilesCount {
+    }
+    getFolderWiseProfilesCount {
       folderID
       profiles
+    }
   }
+`;
+export const getHospitalUsers_Query = /* GraphQL */ `
+  query getHospitalUsers {
+    getHospitalUsers {
+      email
+      huID
+      accessJobPosting
+      accessResumeDB
+      name
+      status
+      userID
+      phoneNumber
+    }
+  }
+`;
+export const getPreviousPostedJobsCount_Query = /* GraphQL */ `
+  query getPreviousPostedJobsCount($jobRole: String!, $vacancyID: String!) {
+    getPreviousPostedJobsCount(jobRole: $jobRole, vacancyID: $vacancyID)
+  }
+`;
+export const getPreviousPostedJobs_Query = /* GraphQL */ `
+  query getPreviousPostedJobs(
+    $start: Int!
+    $count: Int!
+    $jobRole: String!
+    $vacancyID: String!
+  ) {
+    getPreviousPostedJobs(
+      start: $start
+      count: $count
+      jobRole: $jobRole
+      vacancyID: $vacancyID
+    ) {
+      RecruiterName
+      expMax
+      jobRole
+      expMin
+      location
+      vacancyID
+      announcedDate
+      description
+      employmentType
+      gender
+      includeWalkInInterviewDetails
+      locationID
+      minimumSalary
+      maximumSalary
+      postedBy
+      numberOfVacancies
+      postedOn
+      responses
+      shift
+      status
+      teamMedLinkJob
+      totalJobs
+      userAddedJobRoleID
+      vacancyType
+    }
+  }
+`;
+export const getJobPostedBy_Query = /* GraphQL */ `
+  query getJobPostedBy {
+    getJobPostedBy {
+      name
+      userID
+    }
+  }
+`;
+export const getDraftJobCount_Query = /* GraphQL */ `
+  query getDraftJobCount {
+    getDraftJobCount
+  }
+`;
+export const getDraftPostedBy_Query = /* GraphQL */ `
+  query getDraftPostedBy {
+    getDraftPostedBy {
+      name
+      userID
+    }
+  }
+`;
+export const getJobStatus_Query = /* GraphQL */ `
+  query getJobStatus {
+    getJobStatus {
+      status
+    }
+  }
+`;
+export const getVacanciesByBatch_Query = /* GraphQL */ `
+  query getVacanciesByBatch(
+    $start: Int!
+    $count: Int!
+    $jobRole: String!
+    $vacancyID: String!
+    $sortBy: String!
+    $postedByUserID: String!
+    $status: String!
+  ) {
+    getVacanciesByBatch(
+      start: $start
+      count: $count
+      jobRole: $jobRole
+      vacancyID: $vacancyID
+      sortBy: $sortBy
+      postedByUserID: $postedByUserID
+      status: $status
+    ) {
+      location
+      postedBy
+      vacancyID
+      announcedDate
+      description
+      employmentType
+      expMax
+      expMin
+      gender
+      includeWalkInInterviewDetails
+      locationID
+      maximumSalary
+      minimumSalary
+      numberOfVacancies
+      postedOn
+      responses
+      shift
+      status
+      teamMedLinkJob
+      userAddedJobRoleID
+      vacancyType
+      jobRole
+    }
+  }
+`;
+export const getJobPostSpecialization_Query = /* GraphQL */ `
+  query getJobPostSpecialization($vacancyID: Int!) {
+    getJobPostSpecialization(vacancyID: $vacancyID) {
+      jpsID
+      qualification
+      course
+      specialization
+      vacancyID
+      specializationID
+    }
+  }
+`;
+export const getJobRoleAndDepartment_Query = /* GraphQL */ `
+  query getJobRoleAndDepartment($vacancyID: Int!) {
+    getJobRoleAndDepartment(vacancyID: $vacancyID) {
+      department
+      departmentID
+      jobRole
+      jobRoleID
+    }
+  }
+`;
+export const getDraftJobsByBatch_Query = /* GraphQL */ `
+  query getDraftJobsByBatch(
+    $start: Int!
+    $count: Int!
+    $jobRole: String!
+    $vacancyID: String!
+    $sortBy: String!
+    $postedByUserID: String!
+  ) {
+    getDraftJobsByBatch(
+      start: $start
+      count: $count
+      jobRole: $jobRole
+      vacancyID: $vacancyID
+      sortBy: $sortBy
+      postedByUserID: $postedByUserID
+    ) {
+       announcedDate
+        description
+        employmentType
+        expMax
+        expMin
+        gender
+        includeWalkInInterviewDetails
+        location
+        locationID
+        maximumSalary
+        minimumSalary
+        numberOfVacancies
+        postedBy
+        postedOn
+        responses
+        shift
+        status
+        teamMedLinkJob
+        userAddedJobRoleID
+        vacancyID
+        vacancyType
+        jobRole
+    }
+  }
+`;
+export const getRecruiterProfileStrength_Query = /* GraphQL */ `
+  query getRecruiterProfileStrength{
+    getRecruiterProfileStrength{
+      completed
+          strength
+    }
+  }
+`;
+export const getActiveSubscriptions_Query = /* GraphQL */ `
+  query getActiveSubscriptions{
+    getActiveSubscriptions{
+     credits
+     createdOn
+     creditsLeft
+     freeCredits
+     name
+     subtext
+     type
+     validUpto
+    }
   }
 `;

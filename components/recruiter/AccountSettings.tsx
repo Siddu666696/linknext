@@ -1,7 +1,9 @@
 "use client";
+
 import {
   Avatar,
   Box,
+  Breadcrumbs,
   Button,
   Card,
   Checkbox,
@@ -28,6 +30,9 @@ import {
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "@/redux/features/snackbarSlice";
 import LoginSessionExpiredModal from "./LoginSessionExpiredModal";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 const AccountSettings = () => {
   const {
@@ -45,7 +50,12 @@ const AccountSettings = () => {
   const dispatch = useDispatch();
   const user = useAppSelector((state) => state.auth.user);
   const { open, isOpen, close } = UseModalManager();
-
+const router = useRouter();
+  
+    const handleClick = (path: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      router.push(path);
+    };
   const [hospitalID, setHospitalID] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [contactNumber, setContactNumber] = useState("");
@@ -118,8 +128,8 @@ const AccountSettings = () => {
       dispatch(
         openSnackbar({
           message: isChecked
-            ? "Subscribed to newsletter successfully."
-            : "Unsubscribed from newsletter successfully.",
+            ? "Subscribed to NewsLetter successfully."
+            : "Unsubscribed from NewsLetter successfully.",
           severity: false,
         })
       );
@@ -186,7 +196,19 @@ const AccountSettings = () => {
   };
 
   return (
-    <Box sx={{ p: 2, display: "flex", justifyContent: "center", my: 4 }}>
+    <>
+    <Box 
+      sx={{ my:8,mx:30}}
+      >
+              <Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
+                <Link color="inherit" href="/recruiter/recruiterdashboard" onClick={handleClick("/recruiter/recruiterdashboard")}>
+                  Dashboard
+                </Link>
+                <Typography color="primary">Account Settings</Typography>
+              </Breadcrumbs>
+            </Box>
+      
+    <Box sx={{ p: 2, display: "flex", justifyContent: "center", }}>
       <Card sx={{ width: "100%", maxWidth: 600, p: 3 }}>
         <Typography variant="h6" fontWeight={700}>
           Account Settings
@@ -367,6 +389,7 @@ const AccountSettings = () => {
         />
       )}
     </Box>
+    </>
   );
 };
 

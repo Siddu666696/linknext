@@ -20,6 +20,7 @@ import {
   Autocomplete,
   MenuItem,
   ListItemText,
+  Breadcrumbs,
 } from "@mui/material";
 import {
   Work as WorkIcon,
@@ -40,6 +41,10 @@ import {
 } from "@/lib/api/recruiter/queries";
 import { searchCity } from "@/lib/api/open/queries";
 import debounce from "lodash/debounce";
+import Link from "next/link";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { useRouter } from "next/navigation";
+
 
 const QUALIFICATIONS = ["Any Graduate", "Diploma", "Bachelor", "Master", "PhD"];
 const skillsData = ["Dancing", "Drawing", "singing"];
@@ -142,7 +147,7 @@ export default function PostaJob() {
   const [skillData, setSkillData] = useState([]);
   const [skilledData, setSkilledData] = useState([]);
   // const [selectedQualification, setSelectedQualification] = useState<string | null>(null);
-
+const router = useRouter();
   useEffect(() => {
     handleJobRoleSearch("");
     handleDepartmentSearch("");
@@ -151,6 +156,10 @@ export default function PostaJob() {
     setToday(dayjs());
   }, []);
   const onSubmit = (data) => {};
+  const handleClick = (path: string) => (event: React.MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      router.push(path);
+    };
 
   const jobTitleValue = watch("jobTitle") || "";
 
@@ -291,7 +300,11 @@ export default function PostaJob() {
   }, [qualifications]);
 
   return (
-    <Grid container spacing={2} p={1}>
+    <>
+     
+     
+      
+    <Grid container spacing={2} mx={5}>
       <Grid item md={6} xs={12}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={1}>
@@ -1096,5 +1109,6 @@ export default function PostaJob() {
       </Grid>
       <Grid item md={6}></Grid>
     </Grid>
+    </>
   );
 }

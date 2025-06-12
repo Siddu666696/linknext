@@ -4,9 +4,9 @@ import React from 'react'
 const page = () => {
   return (
     <div>
-   <RecruiterNotifications/>   
+   <RecruiterNotifications />   
     </div>
   )
 }
 
-export default page
+export default page;
