@@ -269,5 +269,21 @@ export const companyDetailsSchema = yup.object().shape({
     .min(10, "Contact number must be at least 10 digits"),
 });
 export const adduserSchema = yup.object().shape({
-  fullName: yup.string().required("Full name is required")
+  fullName: yup.string().required("Full name is required"),
+  email: yup
+    .string()
+    .email("Must be a valid email")
+    .required("Email is required")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      "Invalid email"
+    ),
+    phone: yup
+    .string()
+    .required("Contact number is required")
+    .matches(/^[0-9]+$/, "Contact number must be numeric")
+    .min(10, "Contact number must be at least 10 digits"),
+});
+export const addfolderSchema = yup.object().shape({
+  fullName: yup.string().required("Folder name is required"),
 });

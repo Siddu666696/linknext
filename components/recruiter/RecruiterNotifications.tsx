@@ -1,5 +1,4 @@
 "use client";
-import UseModalManager from "@/hooks/UseModalManager";
 import { Box, Button, Modal, Typography, Checkbox, FormControlLabel } from "@mui/material";
 import React, { useState } from "react";
 
@@ -13,8 +12,7 @@ const style = {
   p: 4,
 };
 
-const RecruiterNotifications = () => {
-  const { isOpen, close, open } = UseModalManager();
+const RecruiterNotifications = ( { isOpen, close, open }) => {
 
   const [notifications, setNotifications] = useState({
     "General Communications": { push: false, email: false },
@@ -35,13 +33,13 @@ const RecruiterNotifications = () => {
     close("notification");
   };
 
-  const handleOpen = () => {
-    open("notification");
-  };
+  // const handleOpen = () => {
+  //   open("notification");
+  // };
 
   return (
     <div>
-      <Button onClick={handleOpen}>Open modal</Button>
+      {/* <Button onClick={handleOpen}>Open modal</Button> */}
 
       <Modal
         open={isOpen("notification")}

@@ -42,38 +42,31 @@ const RecruiterProfile = ({ getCroppedImg }) => {
   const { isOpen, open, close } = UseModalManager();
   const [hovered, setHovered] = useState(false);
   const [image, setImage] = useState([]);
-
   const dispatch = useDispatch();
   const profile = useAppSelector((state) => state);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await getHospitalDetails();
-
         const profilePic = data?.getHospitalDetails?.profilePicURL;
         setAboutText(data?.getHospitalDetails?.about);
 
         if (profilePic) {
           const downloadResponse = await downloadDocument(profilePic);
-          const imageSource = `data:image/png;base64,${
-            JSON.parse(downloadResponse?.downloadDocument)?.response?.content
-          }`;
-          if (
-            JSON.parse(downloadResponse?.downloadDocument)?.response?.content
-          ) {
-            setProfilePicURL(imageSource);
+          const content = JSON.parse(downloadResponse?.downloadDocument)?.response?.content;
+          if (content) {
+            setProfilePicURL(`data:image/png;base64,${content}`);
           }
         }
       } catch (error) {
-        console.error(
-          "Failed to fetch hospital details or profile picture:",
-          error
-        );
+        console.error("Failed to fetch hospital details or profile picture:", error);
       }
     };
 
     fetchData();
   }, []);
+
   const [isEditing, setIsEditing] = useState(false);
 
   const handleEditClick = () => {
@@ -92,22 +85,18 @@ const RecruiterProfile = ({ getCroppedImg }) => {
         if (response) {
           setAboutText(description);
           setIsEditing(false);
-          dispatch(
-            openSnackbar({
-              message: "Company about updated successfully",
-              severity: false,
-            })
-          );
+          dispatch(openSnackbar({
+            message: "Company about updated successfully",
+            severity: false,
+          }));
         }
       }
     } catch (error) {
       console.error("Error updating About section:", error);
-      dispatch(
-        openSnackbar({
-          message: "Failed to update About section",
-          severity: true,
-        })
-      );
+      dispatch(openSnackbar({
+        message: "Failed to update About section",
+        severity: true,
+      }));
     }
   };
 
@@ -121,26 +110,20 @@ const RecruiterProfile = ({ getCroppedImg }) => {
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    if (!file) {
-      console.warn("No file selected.");
-      return;
-    }
+    if (!file) return;
+
     const maxSize = 1 * 1024 * 1024;
     if (file.size > maxSize) {
-      dispatch(
-        openSnackbar({
-          message: "Image size should be less than 1 MB",
-          severity: true,
-        })
-      );
+      dispatch(openSnackbar({
+        message: "Image size should be less than 1 MB",
+        severity: true,
+      }));
       return;
     }
-    try {
-      const content = await toBase64(file);
-      const fileName = file.name;
-      setImageName(file?.name);
-      const url = "https://your-api-endpoint.com/upload";
 
+    try {
+      await toBase64(file); // just to validate base64
+      setImageName(file.name);
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
@@ -161,69 +144,55 @@ const RecruiterProfile = ({ getCroppedImg }) => {
       });
 
       const uploadedUrl = JSON.parse(uploadResponse?.uploadDocument)?.url;
-
       if (uploadedUrl) {
         await updateProfilePicURL({ profilePictureURL: uploadedUrl });
-        const downloadResponse = await downloadDocument(uploadedUrl);
-        const imageSource = `data:image/png;base64,${
-          JSON.parse(downloadResponse?.downloadDocument)?.response?.content
-        }`;
-        setProfilePicURL(imageSource);
 
-        dispatch(
-          openSnackbar({
-            message: "Profile picture updated successfully.",
-            severity: false,
-          })
-        );
+        const downloadResponse = await downloadDocument(uploadedUrl);
+        const content = JSON.parse(downloadResponse?.downloadDocument)?.response?.content;
+        if (content) {
+          setProfilePicURL(`data:image/png;base64,${content}`);
+        }
+
+        dispatch(openSnackbar({
+          message: "Profile picture updated successfully.",
+          severity: false,
+        }));
       }
     } catch (error) {
-      dispatch(
-        openSnackbar({
-          message: "Error updating profile picture.",
-          severity: true,
-        })
-      );
+      dispatch(openSnackbar({
+        message: "Error updating profile picture.",
+        severity: true,
+      }));
     }
   };
+
   const handleDeleteImage = async () => {
     try {
       const data = await getHospitalDetails();
       const profilePic = data?.getHospitalDetails?.profilePicURL;
       if (profilePic) {
-        const deleteImage = await deleteDocument(profilePic);
+        await deleteDocument(profilePic);
         setProfilePicURL(null);
         setHovered(false);
-        dispatch(
-          openSnackbar({
-            message: "Profile picture deleted successfully.",
-            severity: false,
-          })
-        );
+        dispatch(openSnackbar({
+          message: "Profile picture deleted successfully.",
+          severity: false,
+        }));
       }
     } catch (error) {
-      dispatch(
-        openSnackbar({
-          message: "Error deleting profile picture.",
-          severity: true,
-        })
-      );
+      dispatch(openSnackbar({
+        message: "Error deleting profile picture.",
+        severity: true,
+      }));
     } finally {
       close("delete");
     }
   };
 
   return (
-    <Grid
-      container
-      justifyContent="center"
-      sx={{ px: { xs: 2, md: 8 } }}
-      width="100%"
-    >
+    <Grid container justifyContent="center" sx={{ px: { xs: 2, md: 8 } }} width="100%">
       <Paper elevation={3} sx={{ width: "100%", p: 2, mx: 12, my: 4 }}>
-        <Typography sx={{ fontSize: "17px", fontWeight: 800 }}>
-          medlink
-        </Typography>
+        <Typography sx={{ fontSize: "17px", fontWeight: 800 }}>medlink</Typography>
 
         <Box sx={{ display: "flex", gap: 3, alignItems: "flex-start" }}>
           <Box
@@ -268,7 +237,6 @@ const RecruiterProfile = ({ getCroppedImg }) => {
                   "&:hover": { bgcolor: "white" },
                 }}
                 size="small"
-                component="label"
               >
                 <DeleteIcon />
               </IconButton>
@@ -288,14 +256,10 @@ const RecruiterProfile = ({ getCroppedImg }) => {
               component="label"
             >
               <PhotoCameraIcon fontSize="small" />
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleFileChange}
-              />
+              <input type="file" accept="image/*" hidden onChange={handleFileChange} />
             </IconButton>
           </Box>
+
           <Box sx={{ flexGrow: 1 }}>
             {!isEditing ? (
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -309,14 +273,19 @@ const RecruiterProfile = ({ getCroppedImg }) => {
             ) : (
               <Accordion
                 elevation={0}
-                sx={{
-                  boxShadow: "none",
-                  "&:before": { display: "none" },
-                }}
+                sx={{ boxShadow: "none", "&:before": { display: "none" } }}
                 expanded
               >
-                <AccordionSummary>
-                  <Typography>Edit About Section</Typography>
+                <AccordionSummary
+                  sx={{
+                    cursor: "default",
+                    minHeight: "0 !important",
+                    "& .MuiAccordionSummary-content": { margin: 0 },
+                  }}
+                >
+                  <Typography sx={{ fontWeight: 600, fontSize: "16px" }}>
+                    Edit About
+                  </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <TextField
@@ -328,25 +297,11 @@ const RecruiterProfile = ({ getCroppedImg }) => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                   />
-                  <Box
-                    sx={{
-                      display: "flex",
-                      gap: 2,
-                      mt: 2,
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSaveClick}
-                    >
+                  <Box sx={{ display: "flex", gap: 2, mt: 2, justifyContent: "flex-end" }}>
+                    <Button variant="contained" color="primary" onClick={handleSaveClick}>
                       Save
                     </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() => setIsEditing(false)}
-                    >
+                    <Button variant="outlined" onClick={() => setIsEditing(false)}>
                       Cancel
                     </Button>
                   </Box>
@@ -361,19 +316,16 @@ const RecruiterProfile = ({ getCroppedImg }) => {
             setImage={setImage}
             isOpen={isOpen}
             srcImage={srcImage}
-            // crop={crop}
             close={close}
             onSave={handleCropSave}
             getCroppedImg={getCroppedImg}
           />
         )}
+
         {isOpen("delete") && (
           <DeleteModal
             title={"Company Logo"}
-            // details={data}
-            handleCloseDeleteModal={() => {
-              close("delete");
-            }}
+            handleCloseDeleteModal={() => close("delete")}
             openDeleteModal={isOpen("delete")}
             handleDelete={handleDeleteImage}
           />

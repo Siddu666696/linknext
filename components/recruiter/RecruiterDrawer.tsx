@@ -19,7 +19,7 @@ const RecruiterDrawer = () => {
   return (
     <Box
       sx={{
-        width: { xs: "100%", md: 260 },
+        width: { xs: "100%", md: 250 },
         bgcolor: "#ffff",
         minHeight: "100vh",
         p: 2,
@@ -36,7 +36,7 @@ const RecruiterDrawer = () => {
           { icon: <CalendarMonthOutlinedIcon fontSize="large" />, text: "Company Profile" },
         ].map((item, index) => (
           <div key={index}>
-            <ListItem button sx={{ flexDirection: "column", alignItems: "center" }}>
+            <ListItem  sx={{ flexDirection: "column", alignItems: "center" }}>
               <ListItemIcon sx={{ minWidth: "auto", mb: 1 }}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} sx={{ textAlign: "center" }} />
             </ListItem>

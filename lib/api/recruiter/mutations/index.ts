@@ -3,16 +3,20 @@ import { Amplify } from "aws-amplify";
 import {
   addHospital_Mutation,
   addHospitalPicture_Mutation,
+  addHospitalUser_Mutation,
   addHRFolder_Mutation,
+  closeJob_Mutation,
   deleteDocument_Mutation,
   deleteFolder_Mutation,
   deleteHospitalAsset_Mutation,
+  deleteHospitalUser_Mutation,
   getHospitalPictures_Mutation,
   renameFolder_Mutation,
   sendEmail_Mutation,
   sendOTPToPhone_Mutation,
   updateHospitalAbout_Mutation,
   UpdateHospitalNewsletter_Mutation,
+  updateHospitalUser_Mutation,
   updateHospitalVideo_Mutation,
   updateProfilePicURL_Mutation,
   uploadDocument_Mutation,
@@ -327,6 +331,78 @@ export const deleteFolder = async (data) => {
       query: deleteFolder_Mutation,
       variables: {
         folderID: folderID
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const AddHospitalUser = async (data) => {
+  ConfigureRecruiterAmplify();
+  const {accessJobPosting,accessResumeDB,email,name,phoneNumber} = data;
+  try {
+    const response = await client.graphql({
+      query: addHospitalUser_Mutation,
+      variables: {
+        accessJobPosting:accessJobPosting,
+        accessResumeDB:accessResumeDB,
+        email:email,
+        name:name,
+        phoneNumber:phoneNumber 
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const updateHospitalUser = async (data) => {
+  ConfigureRecruiterAmplify();
+  const {accessJobPosting,accessResumeDB,email,name,huID} = data;
+  try {
+    const response = await client.graphql({
+      query: updateHospitalUser_Mutation,
+      variables: {
+        accessJobPosting:accessJobPosting,
+        accessResumeDB:accessResumeDB,
+        email:email,
+        name:name,
+        huID:huID
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const deleteHospitalUser = async (data) => {
+  ConfigureRecruiterAmplify();
+  const {huID} = data;
+  try {
+    const response = await client.graphql({
+      query: deleteHospitalUser_Mutation,
+      variables: {
+        huID:huID
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const closeJob = async (data) => {
+  ConfigureRecruiterAmplify();
+  const {vacancyID} = data;
+  try {
+    const response = await client.graphql({
+      query: closeJob_Mutation,
+      variables: {
+        vacancyID:vacancyID
       }
     });
     return response.data;

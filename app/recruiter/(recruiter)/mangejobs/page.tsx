@@ -1,5 +1,5 @@
-// import ManageUser from '@/components/recruiter/ManageUser'
-import ManageUser from '@/components/recruiter/ManageUser'
+"use client"
+import ManageJobsnResponses from '@/components/recruiter/ManageJobsnResponses'
 // import SubUser from '@/components/recruiter/SubUser'
 import React from 'react'
 
@@ -7,7 +7,7 @@ const page = () => {
   return (
     <div>
       {/* <SubUser/> */}
-   <ManageUser/>   
+   <ManageJobsnResponses/>   
     </div>
   )
 }

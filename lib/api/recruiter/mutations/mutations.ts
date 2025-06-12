@@ -155,6 +155,55 @@ mutation deleteFolder($folderID: ID!) {
   }
 }`
 ;
+export const addHospitalUser_Mutation = /* GraphQL */ `
+mutation addHospitalUser($accessJobPosting: Boolean!,$accessResumeDB: Boolean!,$email: String!,$name: String!,$phoneNumber: String!) {
+  addHospitalUser(accessJobPosting:$accessJobPosting,accessResumeDB:$accessResumeDB,email:$email,name:$name,phoneNumber:$phoneNumber){
+  accessJobPosting
+      accessResumeDB
+      adminUser
+      email
+      hospitalID
+      huID
+      status
+      name
+      phoneNumber
+   }
+}`
+;
+export const updateHospitalUser_Mutation = /* GraphQL */ `
+mutation updateHospitalUser($accessJobPosting: Boolean!,$accessResumeDB: Boolean!,$email: String!,$name: String!,$huID: ID!) {
+  updateHospitalUser(accessJobPosting:$accessJobPosting,accessResumeDB:$accessResumeDB,email:$email,name:$name,huID: $huID){
+  accessJobPosting
+    accessResumeDB
+    adminUser
+    email
+    hospitalID
+    huID
+    name
+   }
+}`
+;
+export const deleteHospitalUser_Mutation = /* GraphQL */ `
+mutation deleteHospitalUser($huID: ID!) {
+  deleteHospitalUser(huID: $huID){
+  accessJobPosting
+              accessResumeDB
+              adminUser
+              email
+              hospitalID
+              huID
+              name
+   }
+}`
+;
+export const closeJob_Mutation = /* GraphQL */ `
+mutation closeJob($vacancyID: Int!) {
+  closeJob(vacancyID: $vacancyID)
+}`
+;
+
+
+
 
 
 
