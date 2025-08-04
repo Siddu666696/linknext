@@ -7,6 +7,7 @@ import Box from "@mui/material/Box";
 import { Grid } from "@mui/material";
 import SavedJobsComponent from "./SavedJobsComponent";
 import AppliedJobsComponent from "./AppliedJobsComponent";
+import { useSelector } from "react-redux";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -42,6 +43,7 @@ const MyJobs = () => {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  const profileDetails = useSelector((state) => state);
   return (
     <>
       <Grid container justifyContent={"center"} p={{md:3}}>

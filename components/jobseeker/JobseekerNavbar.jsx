@@ -42,7 +42,7 @@ const JobseekerNavbar = React.memo(function JobseekerNavbar({
   const dispatch = useAppDispatch();
   const location = usePathname();
   const profileDetails = useSelector(
-    (state) => state.profileDetails.profileDetails
+    (state) => state?.profileDetails?.profileDetails
   );
   const searchPaths = [
     "/jobs",
@@ -210,7 +210,7 @@ const JobseekerNavbar = React.memo(function JobseekerNavbar({
                 <Link href="/jobseeker/home">Home</Link>
               </ListItem>
               <ListItem>
-                <Link href="/my-jobs">My Jobs</Link>
+                <Link href="/jobseeker/my-jobs">My Jobs</Link>
               </ListItem>
             </List>
             <Box>
@@ -268,7 +268,7 @@ const JobseekerNavbar = React.memo(function JobseekerNavbar({
                 </Link>
                 <Divider />
 
-                <MenuItem onClick={handleLogout}>
+                <MenuItem onClick={()=>handleLogout}>
                   <LogoutIcon />
                   Logout
                 </MenuItem>

@@ -3,12 +3,12 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* @media (prefers-color-scheme: dark) { */
+  /* :root {
     --background:#ededed ;
     --foreground:#0a0a0a ;
   }
-}
+} */
 
 html,
 body {
@@ -35,8 +35,11 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;
   }
+} */
+::-webkit-scrollbar {
+  display: none;
 }

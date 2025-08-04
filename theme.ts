@@ -203,6 +203,11 @@ components: {
                 fontWeight: 500,
                 color: grey[800]
             },
+            boldWhite:{
+                fontSize: 14,
+                fontWeight: 600,
+                color: "white"
+            },
             timelineTitle: {
                 fontSize: 13,
                 fontWeight: 700,

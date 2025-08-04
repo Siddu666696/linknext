@@ -5,6 +5,7 @@ const jobseekerProfileSlice = createSlice({
   initialState: { profileDetails:null },
   reducers: {
     storeJobseekerProfile: (state, action) => {
+      
      state.profileDetails=action.payload
     },
     resetJobseekerProfile:(state)=>{
