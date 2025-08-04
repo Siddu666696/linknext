@@ -63,17 +63,20 @@ const SignIn = () => {
         },
       });
       const user = await getCurrentUser();
+
       dispatch(login(user));
       const userData = await getProfile();
+
       if (userData) {
-        dispatch(storeJobseekerProfile(userData));
-      }
+        dispatch(storeJobseekerProfile(userData?.getProfile));
+      } 
       dispatch(openSnackbar({ message: "Login Successful", severity: false }));
 
       if (user && !userData) {
         router.push("/registration");
       } else {
-        router.push("/jobseeker/home");
+        const redirect = localStorage.getItem("postAuthRedirect") || "/jobseeker/home";
+        router.push(redirect);
       }
     } catch (error) {
       dispatch(

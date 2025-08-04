@@ -8,6 +8,8 @@ import {
   ExperienceDisplay,
   SalaryDisplay,
 } from "../../lib/utils/commonFunctions";
+import hospital from "../../public/Hospital.png";
+import Image from "next/image";
 // import {WorkIcon, PlaceIcon, AccountBalanceWalletIcon} from "@mui/icons-material";
 const JobCard = ({ jobData }) => {
   const textStyle = {
@@ -33,13 +35,13 @@ const JobCard = ({ jobData }) => {
         }}
       >
         <Link
-          href={`/job/${jobData?.vacancyID}`}
+          href={`/job/${jobData?.jobRole?.replaceAll(" ","")}/${jobData?.vacancyID}/${jobData?.postedOn}`}
           style={{ textDecoration: "none", width: "100%", display: "flex" }}
         >
           <Grid
             item
             xs={12}
-            md={8.5}
+            // md={8.5}
             sx={{
               p: { xs: "16px 12px", md: 0 },
               width: { xs: "100%", md: "auto" },
@@ -70,10 +72,12 @@ const JobCard = ({ jobData }) => {
                     height: { xs: "4rem", md: "2.875rem" },
                   }}
                 >
-                  <img
+                        <Image src={hospital} alt="hospital" width={48} height={36}  />
+                  
+                  {/* <img
                     src={
-                      jobData?.logo === "data:image/png;base64,"
-                        ? defaultRecruiterLogo
+                      !jobData?.logo 
+                        ? null
                         : jobData?.logo
                     }
                     alt={jobData?.jobRole || jobData?.otherJobRole}
@@ -83,7 +87,7 @@ const JobCard = ({ jobData }) => {
                       borderRadius: "6px",
                       objectFit: "cover",
                     }}
-                  />
+                  /> */}
                 </Box>
                 <Box
                   sx={{
@@ -152,8 +156,8 @@ const JobCard = ({ jobData }) => {
               <Typography>
                 <AccountBalanceWalletIcon />
                 {SalaryDisplay({
-                  minimumSalary: jobData?.salaryMin,
-                  maximumSalary: jobData?.salaryMax,
+                  minimumSalary: jobData?.minimumSalary,
+                  maximumSalary: jobData?.maximumSalary,
                   isSalaryDisclosed: jobData?.isSalaryDisclosed,
                 })}
               </Typography>

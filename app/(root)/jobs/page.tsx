@@ -1,22 +1,20 @@
 // app/jobs/[...slug]/page.tsx
-import CategoryCards from "@/components/commonComponents/CategoriesCards";
-import Header from "@/components/commonComponents/Header";
 import JobSearchClient from "@/components/commonComponents/JobSearchClient";
 import { semanticSearchJobs } from "@/lib/api/open/queries/trial";
 import { parseSearchParams } from "@/lib/utils/commonFunctions";
-import { parseSlugToFilters } from "@/lib/utils/slugParser";
 import { Box } from "@mui/material";
+
 
 export default async function JobSearchPage({
   params,
   searchParams,
 }: {
   params: { slug?: string[] };
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key: string]: string | string[] | undefined};
 }) {
   const { slug } = await params;
-  const appliedSearchParams = (await searchParams) || new URLSearchParams();
-  const sp = new URLSearchParams();
+   const appliedSearchParams = await searchParams || new URLSearchParams();
+    const sp = new URLSearchParams();
   for (const key in searchParams) {
     const value = searchParams[key];
     if (Array.isArray(value)) {
@@ -26,18 +24,18 @@ export default async function JobSearchPage({
     }
   }
   const initialFilters = parseSearchParams(sp);
-  const filters = initialFilters;
+  const filters  = initialFilters;
   const query = sp?.get("query") || "";
-  const page = parseInt(sp.get("page") as string) || 1;
+   const page = parseInt(sp.get("page") as string) || 1;
   const limit = parseInt(sp.get("limit") as string) || 10;
-  const sortBy = sp.get("sort")?.toLowerCase() || "relevance";
+
   const offset = (page - 1) * limit;
 
   const data = await semanticSearchJobs({
     limit: limit,
     offset: offset,
     query,
-    sortBy: sortBy,
+    sortBy: "relevance",
     filters,
   });
 
@@ -46,13 +44,12 @@ export default async function JobSearchPage({
 
   return (
     <Box className="p-6">
-      {/* <CategoryCards aggregations={aggregators} /> */}
       <JobSearchClient
         initialJobs={jobs}
         initialAggregators={aggregators}
         initialFilters={filters}
         initialQuery={query}
-        page={page}
+         page={page}
         limit={limit}
         total={data?.sematicSearchJobs?.total || 0}
       />

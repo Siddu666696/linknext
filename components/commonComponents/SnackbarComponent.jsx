@@ -1,3 +1,4 @@
+"use client";
 import { useAppDispatch, useAppSelector } from "@/lib/utils/reduxHooks";
 import { closeSnackbar } from "@/redux/features/snackbarSlice";
 import { Alert, Snackbar } from "@mui/material";
@@ -12,6 +13,7 @@ const SnackbarComponent = () => {
     }
     dispatch(closeSnackbar({}));
   };
+  
   return (
     <Snackbar
       open={snackbar.open}
@@ -19,13 +21,13 @@ const SnackbarComponent = () => {
       onClose={handleClose}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
-      <Alert
+      {snackbar.open && ( <Alert
         onClose={() => handleClose}
-        severity={snackbar.severity ? "error" : "success"}
+        severity={snackbar.severity ||"success"}
         variant="filled"
       >
         {snackbar.message}
-      </Alert>
+      </Alert>)}
     </Snackbar>
   );
 };

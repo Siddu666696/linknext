@@ -6,6 +6,8 @@ import "./globals.css";
 import { ThemeProvider } from "@mui/material";
 import theme from "@/theme";
 import StoreProvider from "./StoreProvider";
+import { ReduxProvider } from "@/redux/Provider";
+import SnackbarComponent from "@/components/commonComponents/SnackbarComponent";
 
 const roboto = Roboto({
   weight: ['400', '700'],
@@ -29,12 +31,11 @@ export default function RootLayout({
     <html lang="en" className={roboto.className}>
       <body>
         <ThemeProvider theme={theme}>
-          <StoreProvider>
             <AppRouterCacheProvider>
-              {children}
-            
+             <ReduxProvider>{children}
+              <SnackbarComponent />
+             </ReduxProvider>    
             </AppRouterCacheProvider>
-          </StoreProvider>
         </ThemeProvider>
       </body>
     </html>
