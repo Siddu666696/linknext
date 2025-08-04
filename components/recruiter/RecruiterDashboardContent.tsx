@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CircularProgress,
-  Divider,
   Grid,
   LinearProgress,
   Typography,
@@ -15,10 +14,7 @@ import {
   AccordionDetails,
 } from "@mui/material";
 import { deepOrange } from "@mui/material/colors";
-import PlaceIcon from "@mui/icons-material/Place";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
-import TodayIcon from "@mui/icons-material/Today";
 import {
   getActiveSubscriptions,
   getHospitalDetails,
@@ -26,6 +22,8 @@ import {
 } from "@/lib/api/recruiter/queries";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import locationiconwithbg from "../../public/assets/icons/locationiconwithbg.svg"
 
 const RecruiterDashboardContent = () => {
   const profileFields = [
@@ -87,11 +85,11 @@ const RecruiterDashboardContent = () => {
     const fetchSubscriptionDetails = async () => {
       try {
         const res = await getActiveSubscriptions();
-        const data = res?.getActiveSubscriptions?.[0]; 
+        const data = res?.getActiveSubscriptions?.[0];
         setCreditsLeft(data?.creditsLeft || 0);
         setTotalCredits(data?.credits || 100);
         setActivate(data?.createdOn);
-        setValid(data?.validUpto); 
+        setValid(data?.validUpto);
       } catch (err) {
         console.error("Error fetching subscription:", err);
       }
@@ -101,7 +99,15 @@ const RecruiterDashboardContent = () => {
     fetchProfileStrength();
     fetchSubscriptionDetails();
   }, []);
-
+  const cardIcons = [
+    "/assets/images/hospitalDashboard/searchCandidate.png",
+    "/assets/images/hospitalDashboard/staffingSoution.png",
+    "/assets/images/hospitalDashboard/brandingSolutin.png",
+  ];
+const reminderNotificationIcons = [
+  "/assets/images/hospitalDashboard/noReminder.png",
+  "/assets/images/hospitalDashboard/noNotification.png",
+];
   return (
     <Grid container justifyContent="center" width="100%" p={1}>
       <Box sx={{ bgcolor: "#395987", p: 3, width: "100%" }}>
@@ -128,14 +134,15 @@ const RecruiterDashboardContent = () => {
             }}
             variant="rounded"
           >
-            M
+           {hospitalName?.charAt(0)?.toUpperCase() || "H"}
           </Avatar>
           <Box textAlign={{ xs: "center", md: "left" }}>
             <Typography variant="h6">{hospitalName}</Typography>
             <Typography
               sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
             >
-              <PlaceIcon fontSize="small" /> {city}, {state}
+              <Image src={locationiconwithbg} alt={location} width={25} height={25} />
+              {city}, {state}
             </Typography>
           </Box>
         </Box>
@@ -154,7 +161,7 @@ const RecruiterDashboardContent = () => {
                       backgroundColor: "#e0e0e0",
                       "& .MuiLinearProgress-bar": {
                         backgroundColor:
-                          strength === 100 ? "#4CAF50" : "#FFA726",
+                          strength === 100 ? "#4CAF50" : "green",
                       },
                     }}
                   />
@@ -179,7 +186,7 @@ const RecruiterDashboardContent = () => {
                 <Typography>Profile Strength</Typography>
               </Grid>
               <Grid item xs={12} md={4}>
-                <Button variant="outlined" sx={{ width: "100%" }}>
+                <Button variant="outlined" sx={{ width: "100%" }} onClick={() => router.push("/recruiter/companyprofile")}>
                   Update Profile
                 </Button>
               </Grid>
@@ -226,7 +233,7 @@ const RecruiterDashboardContent = () => {
                   <Typography>Valid Till : </Typography>
                   <Typography> {valid}</Typography>
                 </Box>
-                <Button variant="contained">Post</Button>
+                <Button  onClick={() => router.push("/recruiter/post-job")} variant="contained">Post</Button>
               </Box>
               <Box
                 sx={{
@@ -245,7 +252,7 @@ const RecruiterDashboardContent = () => {
                     position: "absolute",
                     opacity: 0.6,
                     color: "#395987",
-                    width: { xs: 100, md: 200 }, 
+                    width: { xs: 100, md: 200 },
                     height: { xs: 100, md: 200 },
                   }}
                 />
@@ -279,6 +286,7 @@ const RecruiterDashboardContent = () => {
             </Box>
           </Card>
         </Grid>
+
         {[
           {
             title:
@@ -309,44 +317,44 @@ const RecruiterDashboardContent = () => {
                   </Box>
                   <Button variant="outlined">Explore More</Button>
                 </Box>
-                <PendingActionsIcon
-                  sx={{
-                    width: { xs: 100, md: 200 },
-                    height: { xs: 100, md: 200 },
-                    color: "#395987",
-                  }}
-                />
+                <Box sx={{ mx: 2, my: 2 }}>
+                  <Image
+                    src={cardIcons[index]}
+                    alt="icon"
+                    width={300}
+                    height={300}
+                    style={{ maxWidth: "100%", height: "auto" }}
+                  />
+                </Box>
               </Box>
             </Card>
           </Grid>
         ))}
       </Grid>
-      <Divider />
-      <Grid container spacing={2} mx={1.2} width="100%">
-        {["Reminder", "Notifications"].map((title, idx) => (
-          <Grid item xs={12} md={6} key={idx} sx={{ border: "1px solid" }}>
-            <Box>{title}</Box>
-            <TodayIcon
-              sx={{
-                width: { xs: 120, md: 250 },
-                height: { xs: 120, md: 200 },
-                color: "#395987",
-                mx: "auto",
-                my: 3,
-                display: "block",
-              }}
-            />
-            <Typography sx={{ fontSize: { xs: 14, md: 16 }, fontWeight: 600 }}>
-              {title === "Reminder" ? "No Reminders" : "No Notifications"}
-            </Typography>
-            <Typography sx={{ fontSize: { xs: 12, md: 14 } }}>
-              {title === "Reminder"
-                ? "Add reminder to show it here"
-                : "We will let you know once you have new notifications"}
-            </Typography>
-          </Grid>
-        ))}
-      </Grid>
+      {/* <Divider sx={{ color:"gray"}}/> */}
+      {["Reminder", "Notifications"].map((title, idx) => (
+  <Grid item xs={12} md={6} key={idx} sx={{border:"1 1 1 1 px solid", p:3,}}>
+    <Box>{title}</Box>
+    <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
+      <Image
+        src={reminderNotificationIcons[idx]}
+        alt={`${title} Icon`}
+        width={250}
+        height={250}
+      />
+    </Box>
+    <Box sx={{display:'flex',alignItems:"center",flexDirection:"column"}}>
+    <Typography sx={{ fontSize: { xs: 14, md: 16 }, fontWeight: 600 }}>
+      {title === "Reminder" ? "No Reminders" : "No Notifications"}
+    </Typography>
+    <Typography sx={{ fontSize: { xs: 12, md: 14 } }}>
+      {title === "Reminder"
+        ? "Add reminder to show it here"
+        : "We will let you know once you have new notifications"}
+    </Typography>
+    </Box>
+  </Grid>
+))}
     </Grid>
   );
 };

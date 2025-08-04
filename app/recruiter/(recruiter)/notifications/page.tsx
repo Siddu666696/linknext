@@ -1,10 +1,12 @@
-import RecruiterNotifications from '@/components/recruiter/RecruiterNotifications'
+import Notification from '@/components/recruiter/Notification';
+// import RecruiterNotifications from '@/components/recruiter/RecruiterNotifications'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-   <RecruiterNotifications />   
+   {/* <RecruiterNotifications />    */}
+   <Notification/>
     </div>
   )
 }
