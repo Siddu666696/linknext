@@ -1,104 +1,132 @@
+"use client";
+
 import {
   Avatar,
   Box,
   Button,
   Card,
   Grid,
-  IconButton,
   InputAdornment,
   Pagination,
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
-import { deepOrange } from "@mui/material/colors";
 import PlaceIcon from "@mui/icons-material/Place";
 import WorkIcon from "@mui/icons-material/Work";
 import PaymentsRoundedIcon from "@mui/icons-material/PaymentsRounded";
-import {
-  getPreviousPostedJobs,
-  getPreviousPostedJobsCount,
-} from "@/lib/api/recruiter/queries";
+import { getPreviousPostedJobs } from "@/lib/api/recruiter/queries";
+import debounce from "lodash.debounce";
+
+const rowsPerPage = 5;
 
 const PrefillJobsForm = () => {
-  const [jobList, setJobList] = useState([]);
-  const [totalJobs, setTotalJobs] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [allJobs, setAllJobs] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [page, setPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const handleChangePage = (event, newPage) => {
-    setRowsPerPage(parseInt(event.target.value, 5));
-    setPage(newPage);
-  };
-  // const handleChangeRowsPerPage = (event) => {
-  //     setRowsPerPage(parseInt(event.target.value, 5));
-  //     setPage(1); // Reset to the first page when rows per page changes
-  //   };
-  const fetchJobs = async () => {
-    try {
+  const [loading, setLoading] = useState(true);
+
+  // ✅ Fetch all jobs once
+  useEffect(() => {
+    const fetchJobs = async () => {
       setLoading(true);
-      const start = (page - 1) * rowsPerPage;
+      try {
+        const res = await getPreviousPostedJobs({
+          start: 0,
+          count: 1000, // fetch all jobs
+          vacancyID: "",
+        });
+        const jobs = res?.getPreviousPostedJobs || [];
+        setAllJobs(jobs);
+        setFilteredJobs(jobs);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      const jobRes = await getPreviousPostedJobs({
-        start,
-        count: rowsPerPage,
-        jobRole: "",
-        vacancyID: "",
-      });
+    fetchJobs();
+  }, []);
 
-      const jobs = jobRes?.getPreviousPostedJobs || [];
-      setJobList(jobs);
+  // ✅ Debounced filtering
+  const debouncedFilter = useMemo(
+    () =>
+      debounce((query) => {
+        const filtered = query
+          ? allJobs.filter((job) =>
+              job?.jobRole?.toLowerCase().includes(query.toLowerCase())
+            )
+          : allJobs;
 
-      const countRes = await getPreviousPostedJobsCount(jobs);
-      setTotalJobs(countRes || 0);
-    } catch (error) {
-      console.error("Error loading jobs or count:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setFilteredJobs(filtered);
+        setPage(1);
+      }, 300),
+    [allJobs]
+  );
 
   useEffect(() => {
-    fetchJobs();
-  }, [page, rowsPerPage]);
+    debouncedFilter(searchQuery.trim());
+    return () => debouncedFilter.cancel();
+  }, [searchQuery, debouncedFilter]);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleChangePage = (event, value) => {
+    setPage(value);
+  };
+
+  // ✅ Paginate filtered jobs
+  const paginatedJobs = useMemo(() => {
+    const startIndex = (page - 1) * rowsPerPage;
+    return filteredJobs.slice(startIndex, startIndex + rowsPerPage);
+  }, [filteredJobs, page]);
+
+  const totalPages = Math.ceil(filteredJobs.length / rowsPerPage);
 
   return (
-    <Grid container sx={{ width: "100%", }}>
-      <Box >
+    <Grid container sx={{ width: "100%" }}>
+      <Box
+        sx={{
+          boxShadow: "0px 4px 10px rgba(70, 65, 65, 0.1)",
+          borderRadius: "8px",
+          width: 500,
+        }}
+      >
+        {/* Header */}
         <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            flexWrap: "wrap",
             alignItems: "center",
-            // mx: 4,
             my: 2,
+            px: 2,
           }}
         >
-          <Typography variant="h5" mx={5}>
-            Prefill from previous jobs
-          </Typography>
+          <Typography variant="h5">Prefill from previous jobs</Typography>
           <Button>
             <CloseIcon />
           </Button>
         </Box>
 
         {/* Search */}
-        <Box sx={{ px: 2, }}>
+        <Box sx={{ px: 2 }}>
           <TextField
             fullWidth
-            id="SearchBar"
             size="small"
             type="search"
             placeholder="Input search text"
+            value={searchQuery}
+            onChange={handleSearchChange}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="start">
-                  <IconButton>
-                    <SearchIcon />
-                  </IconButton>
+                  <SearchIcon />
                 </InputAdornment>
               ),
             }}
@@ -106,84 +134,81 @@ const PrefillJobsForm = () => {
         </Box>
 
         {/* Job Cards */}
-        {loading ? (
-          <Typography sx={{ mx: 2, mt: 2 }}>Loading jobs...</Typography>
-        ) : jobList.length === 0 ? (
-          <Typography sx={{ mx: 2, mt: 2 }}>No previous jobs found.</Typography>
-        ) : (
-          jobList.map((job, index) => (
-            <Card key={job.id || index} sx={{ mx: 2, my: 2, p: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={2}>
-                  <Avatar
-                    sx={{
-                      bgcolor: deepOrange[500],
-                      width: 60,
-                      height: 60,
-                      fontSize: 35,
-                      mx: "auto",
-                    }}
-                    variant="rounded"
-                  >
-                    {job?.RecruiterName?.charAt(0)?.toUpperCase() || "M"}
-                  </Avatar>
+        <Box sx={{ px: 2 }}>
+          {loading ? (
+            <Typography sx={{ mt: 2 }}>Loading jobs...</Typography>
+          ) : paginatedJobs.length === 0 ? (
+            <Typography sx={{ mt: 2 }}>No jobs matched your search.</Typography>
+          ) : (
+            paginatedJobs.map((job, index) => (
+              <Card key={job.id || index} sx={{ my: 2, p: 2 }}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={2}>
+                    <Avatar
+                      sx={{
+                        bgcolor: "rgb(242, 153, 74)",
+                        width: 60,
+                        height: 60,
+                        fontSize: 35,
+                        mx: "auto",
+                      }}
+                      variant="rounded"
+                    >
+                      {job?.RecruiterName?.charAt(0)?.toUpperCase() || "M"}
+                    </Avatar>
+                  </Grid>
+                  <Grid item xs={12} sm={10}>
+                    <Typography variant="h6">
+                      {job?.jobRole || "Job Role"} ({job?.expMin ?? "1"} -{" "}
+                      {job?.expMax ?? "2"} Y Exp)
+                    </Typography>
+                    <Typography variant="body1" mt={1}>
+                      {job?.RecruiterName || "Unknown"}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 2,
+                        mt: 2,
+                        my: 2,
+                      }}
+                    >
+                      <PlaceIcon fontSize="small" />
+                      {job?.location || "Hyderabad, Telangana"}
+                      <WorkIcon fontSize="small" sx={{ ml: 2 }} />
+                      {job?.expMin ?? "1"} Year
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mt: 0.5,
+                      }}
+                    >
+                      <PaymentsRoundedIcon fontSize="small" />
+                      {job?.minimumSalary} - {job?.maximumSalary ?? "2"} Lakhs
+                    </Typography>
+                  </Grid>
                 </Grid>
-
-                <Grid item xs={12} sm={10}>
-                  <Typography variant="h6">
-                    {job?.jobRole || "Job Role"} ({job?.expMin ?? "1"} -{" "}
-                    {job?.expMax ?? "2"} Y Exp)
-                  </Typography>
-                  <Typography variant="body1" mt={1}>
-                    {job?.RecruiterName || "Unknown"}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mt: 0.5,
-                    }}
-                  >
-                    <PlaceIcon fontSize="small" />
-                    {job?.location || "Hyderabad, Telangana"}
-                    <WorkIcon fontSize="small" sx={{ ml: 2 }} />
-                    {job?.expMin ?? "1"} Year
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mt: 0.5,
-                    }}
-                  >
-                    <PaymentsRoundedIcon fontSize="small" />
-                    {job?.minimumSalary} - {job?.maximumSalary ?? "2"} Lakhs
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Card>
-          ))
-        )}
+              </Card>
+            ))
+          )}
+        </Box>
 
         {/* Pagination */}
-        <Box
-          display="flex"
-          justifyContent="center"
-          flexWrap="wrap"
-          my={3}
-          gap={2}
-        >
-          {jobList?.length > 0 && (
+        <Box display="flex" justifyContent="center" my={2}>
+          {totalPages > 1 && (
             <Pagination
-              count={Math.ceil(jobList?.length / rowsPerPage)}
+              count={totalPages}
               page={page}
+              onChange={handleChangePage}
+              color="primary"
               variant="outlined"
               shape="rounded"
-              onChange={handleChangePage}
             />
           )}
         </Box>

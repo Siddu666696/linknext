@@ -7,8 +7,10 @@ import {
   Button,
   Menu,
   MenuItem,
+  Box,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useRouter } from "next/navigation";
 
 const DraftJob = ({
   jobList,
@@ -19,6 +21,7 @@ const DraftJob = ({
   handleCloseJob,
  
 }) => {
+  const router = useRouter();
   return (
     <>
       {jobList?.length > 0 ? (
@@ -27,14 +30,30 @@ const DraftJob = ({
             <Card sx={{ p: 2 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={9}>
+                  <Box sx={{display:"flex", flexDirection:"row",gap:4}}>
                   <Typography variant="h6" my={1}>
                     {job?.jobRole}
                   </Typography>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{
+                      backgroundColor:
+                        "gray",
+                      color: "#fff",
+                      mb: 1,my:1,
+                    }}
+                  >
+                    Not Published
+                  </Button>
+                  </Box>
                   <Grid container spacing={3}>
                     <Grid item xs={6} sm={3}>
+                      
                       <Typography>
                         Posted By:{job?.postedBy} 
                       </Typography>
+                      
                     </Grid>
                     <Grid item xs={6} sm={5}>
                       <Typography>Date Posted: Not yet Posted</Typography>
@@ -55,18 +74,11 @@ const DraftJob = ({
                   justifyContent="flex-end"
                   alignItems="flex-start"
                 >
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{
-                      backgroundColor:
-                        "gray",
-                      color: "#fff",
-                      mb: 1,
-                    }}
-                  >
-                    Not Published
-                  </Button>
+                  <Button  variant="contained" onClick={() => {
+    localStorage.setItem("draftJobData", JSON.stringify(job));
+    router.push("/recruiter/post-job");
+  }}>Post</Button>
+                  
                   <Button onClick={(e) => handleMenuClick(e, job.vacancyID)}>
                     <MoreVertIcon />
                   </Button>

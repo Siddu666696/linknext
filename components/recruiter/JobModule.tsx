@@ -13,6 +13,7 @@ const JobModule = () => {
       event.preventDefault();
       router.push(path);
     };
+    
   return (
     <div>
       <Box sx={{ my: 10, mx: 12 }}>

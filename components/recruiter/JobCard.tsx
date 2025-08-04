@@ -7,6 +7,7 @@ import {
   Button,
   Menu,
   MenuItem,
+  Box,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 
@@ -27,9 +28,27 @@ const JobCard = ({
             <Card sx={{ p: 2 }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={9}>
+                  <Box sx={{display:"flex", flexDirection:"row", gap:4}}>
                   <Typography variant="h6" my={1}>
                     {job?.jobRole}
                   </Typography>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    sx={{
+                      backgroundColor:
+                        job?.status === "Open"
+                          ? "green"
+                          : job?.status === "Closed"
+                          ? "rgb(242, 153, 74)"
+                          : "gray",
+                      color: "#fff",height:25,my:1,
+                      mb: 1,
+                    }}
+                  >
+                    {job?.status}
+                  </Button>
+                  </Box>
                   <Grid container spacing={3}>
                     <Grid item xs={6} sm={3}>
                       <Typography>
@@ -55,22 +74,7 @@ const JobCard = ({
                   justifyContent="flex-end"
                   alignItems="flex-start"
                 >
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{
-                      backgroundColor:
-                        job?.status === "Open"
-                          ? "green"
-                          : job?.status === "Closed"
-                          ? "orange"
-                          : "gray",
-                      color: "#fff",
-                      mb: 1,
-                    }}
-                  >
-                    {job?.status}
-                  </Button>
+                  
                   <Button onClick={(e) => handleMenuClick(e, job.vacancyID)}>
                     <MoreVertIcon />
                   </Button>

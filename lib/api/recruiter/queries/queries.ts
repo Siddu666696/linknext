@@ -167,49 +167,39 @@ export const getHospitalUsers_Query = /* GraphQL */ `
   }
 `;
 export const getPreviousPostedJobsCount_Query = /* GraphQL */ `
-  query getPreviousPostedJobsCount($jobRole: String!, $vacancyID: String!) {
+  query getPreviousPostedJobsCount($jobRole: String, $vacancyID: String) {
     getPreviousPostedJobsCount(jobRole: $jobRole, vacancyID: $vacancyID)
   }
 `;
 export const getPreviousPostedJobs_Query = /* GraphQL */ `
-  query getPreviousPostedJobs(
-    $start: Int!
-    $count: Int!
-    $jobRole: String!
-    $vacancyID: String!
-  ) {
-    getPreviousPostedJobs(
-      start: $start
-      count: $count
-      jobRole: $jobRole
-      vacancyID: $vacancyID
-    ) {
-      RecruiterName
-      expMax
-      jobRole
-      expMin
-      location
-      vacancyID
-      announcedDate
-      description
-      employmentType
-      gender
-      includeWalkInInterviewDetails
-      locationID
-      minimumSalary
-      maximumSalary
-      postedBy
-      numberOfVacancies
-      postedOn
-      responses
-      shift
-      status
-      teamMedLinkJob
-      totalJobs
-      userAddedJobRoleID
-      vacancyType
-    }
+  query getPreviousPostedJobs  {
+    getPreviousPostedJobs (start:0, count:10, vacancyID:"", jobRole:"") {
+    RecruiterName
+    expMax
+    jobRole
+    expMin
+    location
+    vacancyID
+    announcedDate
+    description
+    employmentType
+    gender
+    includeWalkInInterviewDetails
+    locationID
+    minimumSalary
+    maximumSalary
+    postedBy
+    numberOfVacancies
+    postedOn
+    responses
+    shift
+    status
+    teamMedLinkJob
+    totalJobs
+    userAddedJobRoleID
+    vacancyType
   }
+}
 `;
 export const getJobPostedBy_Query = /* GraphQL */ `
   query getJobPostedBy {

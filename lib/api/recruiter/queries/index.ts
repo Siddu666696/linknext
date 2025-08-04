@@ -247,14 +247,9 @@ export const getHospitalUsers = async () => {
 };
 export const getPreviousPostedJobsCount = async (data) => {
   ConfigureRecruiterAmplify();
-  const [jobRole,vacancyID] = data;
   try {
     const response = await client.graphql({
       query: getPreviousPostedJobsCount_Query,
-      variables:{
-        jobRole:jobRole,
-        vacancyID:vacancyID
-      }
          });
     return response.data;
   } catch (error) {
@@ -264,16 +259,9 @@ export const getPreviousPostedJobsCount = async (data) => {
 };
 export const getPreviousPostedJobs = async (data) => {
   ConfigureRecruiterAmplify();
-  const {start,count,jobRole,vacancyID} = data;
   try {
     const response = await client.graphql({
-      query: getPreviousPostedJobs_Query,
-      variables: {
-       start:start,
-       count:count,
-       jobRole:jobRole,
-       vacancyID:vacancyID
-      },
+      query: getPreviousPostedJobs_Query
     });
     return response.data;
   } catch (error) {

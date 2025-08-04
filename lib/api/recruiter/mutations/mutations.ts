@@ -201,6 +201,11 @@ mutation closeJob($vacancyID: Int!) {
   closeJob(vacancyID: $vacancyID)
 }`
 ;
+export const removeRecruiterDeviceToken_Mutation = /* GraphQL */ `
+mutation removeRecruiterDeviceToken($deviceToken: String!) {
+  removeRecruiterDeviceToken(deviceToken: $deviceToken)
+}`
+;
 
 
 

@@ -11,6 +11,7 @@ import {
   deleteHospitalAsset_Mutation,
   deleteHospitalUser_Mutation,
   getHospitalPictures_Mutation,
+  removeRecruiterDeviceToken_Mutation,
   renameFolder_Mutation,
   sendEmail_Mutation,
   sendOTPToPhone_Mutation,
@@ -404,6 +405,22 @@ export const closeJob = async (data) => {
       variables: {
         vacancyID:vacancyID
       }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const removeRecruiterDeviceToken = async () => {
+  ConfigureRecruiterAmplify();
+  // const {deviceToken} = data;
+  try {
+    const response = await client.graphql({
+      query: removeRecruiterDeviceToken_Mutation,
+      // variables: {
+      //   deviceToken:deviceToken
+      // }
     });
     return response.data;
   } catch (error) {

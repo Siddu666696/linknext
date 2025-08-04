@@ -1,3 +1,5 @@
+// ManageJobs.jsx (Updated for Filtering by Status)
+
 "use client";
 
 import * as React from "react";
@@ -9,9 +11,8 @@ import {
   FormControl,
   Select,
   Pagination,
-  ToggleButton,
-  ToggleButtonGroup,
   Box,
+  Menu,
 } from "@mui/material";
 import {
   getJobStatus,
@@ -30,11 +31,20 @@ import UseModalManager from "@/hooks/UseModalManager";
 import JobDetailsModal from "./JobDetailsModal";
 import JobCard from "./JobCard";
 import DraftJob from "./DraftJob";
+import { useRouter } from "next/navigation";
+import EmptyManageJobs from "./EmptyManageJobs";
 
-const ManageJobs = () => {
-  const [alignment, setAlignment] = React.useState("published");
+const ManageJobs = ({
+  alignment,
+  selectedStatuses,
+  setAlignment,
+  jobList,
+  draftCount,
+  setJobList,
+  setDraftCount,
+  setShowJobStatusFilter,
+}) => {
   const [age, setAge] = React.useState(10);
-  const [jobList, setJobList] = React.useState([]);
   const [jobPostedByMap, setJobPostedByMap] = React.useState({});
   const { startLoading, stopLoading } = UseLoading();
   const [page, setPage] = React.useState(1);
@@ -43,12 +53,11 @@ const ManageJobs = () => {
   const [menuAnchorEls, setMenuAnchorEls] = React.useState({});
   const dispatch = useDispatch();
   const { isOpen, close, open } = UseModalManager();
+  const router = useRouter();
+  const [draftJobs, setDraftJobs] = React.useState([]);
+
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeAge = (event) => setAge(event.target.value);
-  const handleChange = (e, newAlignment) =>
-    newAlignment && setAlignment(newAlignment);
-  const [draftJobs, setDraftJobs] = React.useState([]);
-  const [draftCount, setDraftCount] = React.useState(0);
 
   const handleViewJob = (job) => {
     setSelectedJob(job);
@@ -77,6 +86,11 @@ const ManageJobs = () => {
       openSnackbar("Failed to close job", "error");
     }
   };
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem("jobTab");
+    if (saved) setAlignment(saved);
+  }, []);
 
   const getUser = React.useCallback(async () => {
     try {
@@ -108,6 +122,7 @@ const ManageJobs = () => {
         const startIndex = (page - 1) * rowsPerPage;
 
         if (alignment === "published") {
+          setShowJobStatusFilter(true); // ✅ Show job status filter only for published
           await getJobStatus();
           const res = await getVacanciesByBatch({
             start: startIndex,
@@ -116,10 +131,11 @@ const ManageJobs = () => {
             vacancyID: "",
             sortBy: "",
             postedByUserID: "",
-            status: "",
+            status: selectedStatuses.join(","),
           });
           setJobList(res?.getVacanciesByBatch || []);
         } else {
+          setShowJobStatusFilter(false); // ✅ Hide filter in draft tab
           const draftRes = await getDraftJobsByBatch({
             start: startIndex,
             count: rowsPerPage,
@@ -127,7 +143,6 @@ const ManageJobs = () => {
             vacancyID: "",
             sortBy: "",
             postedByUserID: "",
-            // status: "",
           });
           const countRes = await getDraftJobCount();
           setDraftJobs(draftRes?.getDraftJobsByBatch || []);
@@ -138,165 +153,32 @@ const ManageJobs = () => {
       }
     };
     fetchJobs();
-  }, [page, rowsPerPage, alignment]);
+  }, [page, rowsPerPage, alignment, setShowJobStatusFilter, selectedStatuses,setShowJobStatusFilter]);
 
+  const filteredJobs = selectedStatuses.length
+    ? jobList.filter((job) => selectedStatuses.includes(job.status))
+    : jobList;
+  if (alignment === "published") {
+    setShowJobStatusFilter(true); // ✅ Show for published
+  } else {
+    setShowJobStatusFilter(false); // ✅ Hide for draft
+  }
   return (
     <Grid container spacing={2} sx={{ px: 2, py: 3 }}>
-      {/* Header with toggle buttons and create button */}
-      <Grid container spacing={2} alignItems="center">
-        <Grid item xs={12} md={6}>
-          <Grid container justifyContent="center">
-            <ToggleButtonGroup
-              color="primary"
-              value={alignment}
-              exclusive
-              onChange={handleChange}
-              aria-label="Job Filter"
-            >
-              <ToggleButton value="published">
-                Publish Jobs | {jobList?.length}
-              </ToggleButton>
-              <ToggleButton value="draft">
-                Draft Jobs | {draftCount}
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Grid>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <Grid container spacing={2} justifyContent="flex-end">
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <Grid item>
-                <Button variant="contained" size="small">
-                  Create
-                </Button>
-              </Grid>
-              <Box sx={{ display: "flex", flexDirection: "row", gap: 3 }}>
-                <Grid item>
-                  <Typography sx={{ my: 1 }}>Show</Typography>
-                </Grid>
-                <Grid item>
-                  <FormControl size="small" sx={{ minWidth: 20 }}>
-                    <Select value={age} onChange={handleChangeAge}>
-                      <MenuItem value={10}>20</MenuItem>
-                      <MenuItem value={20}>40</MenuItem>
-                      <MenuItem value={30}>60</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Box>
-            </Box>
-          </Grid>
-        </Grid>
-      </Grid>
-
-      {/* Job List */}
-      {/* {jobList.length > 0 ? (
-        jobList.map((job) => (
-          <Grid item xs={12} key={job.vacancyID} my={1}>
-            <Card sx={{ p: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={9}>
-                  <Typography variant="h6" my={1}>
-                    {job?.jobRole}
-                  </Typography>
-                  <Grid
-                    container
-                    spacing={3}
-                    sx={{ display: "flex", flexDirection: "row" }}
-                  >
-                    <Grid item xs={6} sm={3}>
-                      <Typography>
-                        Posted By: {job?.postedBy || "Unknown"}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={5}>
-                      <Typography>Date Posted: {job?.postedOn}</Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                      <Typography>
-                        Total Applications: {job?.responses}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-
-                <Grid
-                  item
-                  xs={12}
-                  sm={3}
-                  container
-                  justifyContent="flex-end"
-                  alignItems="flex-start"
-                >
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{
-                      backgroundColor:
-                        job?.status === "Open"
-                          ? "green"
-                          : job?.status === "Closed"
-                          ? "orange"
-                          : "gray",
-                      color: "#fff",
-                      mb: 1,
-                    }}
-                  >
-                    {job?.status}
-                  </Button>
-                  <Button onClick={(e) => handleMenuClick(e, job.vacancyID)}>
-                    <MoreVertIcon />
-                  </Button>
-                  <Menu
-                    anchorEl={menuAnchorEls[job.vacancyID]}
-                    open={Boolean(menuAnchorEls[job.vacancyID])}
-                    onClose={() => handleMenuClose(job.vacancyID)}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    transformOrigin={{ vertical: "top", horizontal: "right" }}
-                  >
-                    <MenuItem
-                      onClick={() => {
-                        handleViewJob(job);
-                        handleMenuClose(job.vacancyID);
-                      }}
-                    >
-                      View Job
-                    </MenuItem>
-                    <MenuItem onClick={() => handleMenuClose(job.vacancyID)}>
-                      Edit
-                    </MenuItem>
-                    <MenuItem
-                      onClick={() => {
-                        handleCloseJob(job.vacancyID);
-                        handleMenuClose(job.vacancyID);
-                      }}
-                    >
-                      Close Job
-                    </MenuItem>
-                    <MenuItem onClick={() => handleMenuClose(job.vacancyID)}>
-                      Renew Job
-                    </MenuItem>
-                    <MenuItem onClick={() => handleMenuClose(job.vacancyID)}>
-                      Delete Job
-                    </MenuItem>
-                    <MenuItem onClick={() => handleMenuClose(job.vacancyID)}>
-                      Copy & Create New
-                    </MenuItem>
-                  </Menu>
-                </Grid>
-              </Grid>
-            </Card>
-          </Grid>
-        ))
-      ) : (
+      {alignment === "published" && filteredJobs.length === 0 && (
         <Grid item xs={12}>
-          <Typography>No jobs available</Typography>
+          <EmptyManageJobs />
         </Grid>
-      )} */}
+      )}
+      {alignment === "draft" && draftCount === 0 && (
+        <Grid item xs={12}>
+          <EmptyManageJobs />
+        </Grid>
+      )}
+
       {alignment === "published" ? (
         <JobCard
-          jobList={jobList}
+          jobList={filteredJobs}
           handleMenuClick={handleMenuClick}
           handleMenuClose={handleMenuClose}
           menuAnchorEls={menuAnchorEls}
@@ -314,12 +196,11 @@ const ManageJobs = () => {
         />
       )}
 
-      {/* Pagination */}
-      {(alignment === "published" ? jobList.length : draftCount) > 0 && (
+      {(alignment === "published" ? filteredJobs.length : draftCount) > 0 && (
         <Grid item xs={12} container justifyContent="center">
           <Pagination
             count={Math.ceil(
-              (alignment === "published" ? jobList.length : draftCount) /
+              (alignment === "published" ? filteredJobs.length : draftCount) /
                 rowsPerPage
             )}
             page={page}
@@ -328,15 +209,7 @@ const ManageJobs = () => {
           />
         </Grid>
       )}
-      {/* Filter Toggle */}
-      {/* <Grid item xs={12}> */}
-      {/* <Button onClick={toggleFilter}>
-      {isFilterOpen ? "Hide Filters" : "Show Filters"}
-    </Button>
-    {isFilterOpen && <Typography>Filter content goes here...</Typography>}
-  </Grid> */}
 
-      {/* Job Details Modal */}
       {isOpen("job") && selectedJob && (
         <JobDetailsModal
           isOpen={isOpen}

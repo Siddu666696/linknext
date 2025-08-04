@@ -86,11 +86,11 @@ const CompanyDetailsData = ({ handleClose }) => {
                   fullWidth
                   placeholder="Enter Comapny Type"
                   size="small"
-                  {...register("companyType", {
+                  {...register("hospitalType", {
                     required: "Address is required",
                   })}
-                  error={!!errors.companyType}
-                  helperText={errors?.companyType?.message}
+                  error={!!errors.hospitalType}
+                  helperText={errors?.hospitalType?.message}
                 />
               </Grid>
 
