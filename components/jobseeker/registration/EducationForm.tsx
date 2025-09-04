@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
@@ -17,54 +17,41 @@ import { School as SchoolIcon } from "@mui/icons-material";
 import { educationValidationSchema } from "@/schema/jobseekerSchema";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import {
+  getCourseId,
+  getCourseMaster,
+  getEducationList,
+  getQualifications,
+  getSkillMaster,
+  getSpecialization,
+  getUniversityId,
+} from "@/lib/api/jobseeker/queries";
 
 // Predefined Data
 const QUALIFICATION_OPTIONS = [
-  { label: "10th", value: "10th" },
-  { label: "12th", value: "12th" },
-  { label: "Diploma", value: "diploma" },
-  { label: "Bachelor", value: "bachelor" },
-  { label: "Master", value: "master" },
-  { label: "PhD", value: "phd" },
+  { label: "10/12th", value: "10/12th" },
+  { label: "Doctorate/PhD", value: "Doctorate/PhD" },
+  { label: "Masters/Post-Graduation", value: "Masters/Post-Graduation" },
+  { label: "Fellowship/Certificate", value: "Fellowship/Certificate" },
+  { label: "Graduation/Diploma", value: "Graduation/Diploma" },
+  { label: "Other", value: "Other" },
 ];
 
-const COURSE_OPTIONS = [
-  "Engineering",
-  "Medical",
-  "Management",
-  "Arts",
-  "Commerce",
-  "Other",
-];
-const SPECIALIZATION_OPTIONS = [
-  "Oncology",
-  "Botany",
-  "Biotechnology",
-  "Nanotechnology",
-  "Health Promotion",
-];
-const INSTITUTE_OPTIONS = [
-  "Harvard University",
-  "Stanford University",
-  "MIT",
-  "University of Oxford",
-  "Other",
-];
-const SKILL_OPTIONS = [
-  "EMT",
-  "Treat Patient",
-  "Addiction disorders",
-  "X-ray",
-  "CT Scan",
-  "Physical exams",
-];
+// const SPECIALIZATION_OPTIONS = [
+//   "Oncology",
+//   "Botany",
+//   "Biotechnology",
+//   "Nanotechnology",
+//   "Health Promotion",
+// ];
+
 // Types
 interface EducationFormData {
-  qualifications: string[];
-  course: string;
+  qualifications: string;
+  course: object;
   otherCourse?: string;
-  specialization: string;
-  otherSpecialization?: string;
+  specialization: object;
+  otherSpecialization?: object;
   institute: string;
   otherInstitute?: string;
   passingYear: Date;
@@ -81,10 +68,10 @@ export default function JobseekerEducation() {
   } = useForm<EducationFormData>({
     resolver: yupResolver(educationValidationSchema),
     defaultValues: {
-      qualifications: [],
-      course: "",
-      specialization: "",
-      institute: "",
+      qualifications: "",
+      course: { course: "" },
+      specialization: { specialization: "" },
+      institute: " ",
       passingYear: undefined,
       skills: [],
     },
@@ -92,25 +79,96 @@ export default function JobseekerEducation() {
 
   const qualification = watch("qualifications");
   const course = watch("course");
+  console.log(qualification);
+  console.log(course);
 
   const onSubmit = async (data: EducationFormData) => {
     try {
-      // Implement your API submission logic here
     } catch (error) {
       console.error("Submission Error:", error);
     }
   };
 
   const [qualifications, setQualifications] = useState<string[]>([]);
+  // console.log(qualifications)
+
+  const [courseOptions, setCourseOptions] = useState<string[]>([]);
+  const [specializationOptions, setSpecializationOptions] = useState<string[]>([]);
+  const [universityId, setUniversityId] = useState<string[]>([]);
+  const [skillMaster, setSkillMaster] = useState<string[]>([]);
 
   const handleQualificationSelect = (qualification: string) => {
-    const updatedQualifications = qualifications.includes(qualification)
-      ? qualifications.filter((q) => q !== qualification)
-      : [...qualifications, qualification];
-
-    setQualifications(updatedQualifications);
-    setValue("qualifications", updatedQualifications, { shouldValidate: true });
+    setQualifications([qualification]);
+    setValue("qualifications", [qualification], { shouldValidate: true });
   };
+
+  useEffect(() => {
+    try {
+      const fetchCourse = () => {
+        getCourseMaster({
+          industry: "other",
+          qualification: qualification[0],
+        }).then((res) => {
+          console.log(res);
+          setCourseOptions(res.getCourse);
+        });
+      };
+      if (qualification.length) {
+        fetchCourse();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [qualification]);
+
+  useEffect(() => {
+    try {
+      const fetchSpecialization = () => {
+        getSpecialization({
+          course: course.course,
+          industry : "other",
+          qualification : qualification[0],
+          specialization : ""
+        }).then((res) => {
+          console.log(res, "getSpecialization API Response")
+          setSpecializationOptions(res.getSpecialization)
+        })
+      }
+      if (course?.course) {
+      fetchSpecialization();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }, [course])
+
+  const fetchUniversityId = () => {
+    getUniversityId().then((res) => {
+      // console.log(res, "fetchUniversityId API Response");
+      setUniversityId(
+        res.getUniversityMaster.map((id) => {
+          // console.log(id);
+          return id.name;
+        })
+      );
+    });
+  };
+  const fetchSkillMaster = () => {
+    getSkillMaster().then((res) => {
+      // console.log(res, "fetchSkillMaster API Response");
+      setSkillMaster(res.getSkillMaster);
+      console.log(res.getSkillMaster);
+    });
+  };
+
+  useEffect(() => {
+    try {
+      fetchUniversityId();
+      fetchSkillMaster();
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
 
   return (
     <Grid container>
@@ -128,7 +186,6 @@ export default function JobseekerEducation() {
               {QUALIFICATION_OPTIONS.map((qual) => (
                 <Grid item key={qual.value}>
                   <Chip
-                    
                     label={qual.label}
                     // color={
                     //   qualifications.includes(qual.value)
@@ -165,7 +222,9 @@ export default function JobseekerEducation() {
                     render={({ field }) => (
                       <Autocomplete
                         {...field}
-                        options={COURSE_OPTIONS}
+                        onChange = {(event, value) => field.onChange(value) }
+                        options={courseOptions}
+                        getOptionLabel={(option) => option?.course}
                         fullWidth
                         renderInput={(params) => (
                           <TextField
@@ -177,11 +236,11 @@ export default function JobseekerEducation() {
                             helperText={errors.course?.message}
                           />
                         )}
-                        onChange={(event, value) => {
-                          setValue("course", value || "", {
-                            shouldValidate: true,
-                          });
-                        }}
+                        // onChange={(event, value) => {
+                        //   setValue("course", value, {
+                        //     shouldValidate: true,
+                        //   });
+                        // }}
                       />
                     )}
                   />
@@ -221,7 +280,8 @@ export default function JobseekerEducation() {
                       <Autocomplete
                         {...field}
                         freeSolo
-                        options={SPECIALIZATION_OPTIONS}
+                        options={specializationOptions}
+                        getOptionLabel={(option)=> option.specialization}
                         onChange={(_, value) => {
                           field.onChange(value);
                         }}
@@ -252,7 +312,7 @@ export default function JobseekerEducation() {
                     render={({ field }) => (
                       <Autocomplete
                         {...field}
-                        options={INSTITUTE_OPTIONS}
+                        options={universityId}
                         fullWidth
                         renderInput={(params) => (
                           <TextField
@@ -275,35 +335,35 @@ export default function JobseekerEducation() {
                 </Grid>
 
                 <Grid item xs={12}>
-              <InputLabel>
-                Passing Year<span style={{ color: "red" }}>*</span>
-              </InputLabel>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Controller
-                  control={control}
-                  name={`passingYear`}
-                  render={({ field }) => (
-                    <>
-                      <DatePicker
-                        {...field}
-                        views={[ "year"]}
-                        format="YYYY"
-                        sx={{ width: "100%" }}
-                        size="small"
-                        slotProps={{
-                          textField: {
-                            size: "small",
-                            placeholder: "Select From Date",
-                            // error=!!errors.passingYear,
-                            // helperText=errors.passingYear?.message
-                          },
-                        }}
-                      />
-                    </>
-                  )}
-                />
-              </LocalizationProvider>
-            </Grid>
+                  <InputLabel>
+                    Passing Year<span style={{ color: "red" }}>*</span>
+                  </InputLabel>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <Controller
+                      control={control}
+                      name={`passingYear`}
+                      render={({ field }) => (
+                        <>
+                          <DatePicker
+                            {...field}
+                            views={["year"]}
+                            format="YYYY"
+                            sx={{ width: "100%" }}
+                            size="small"
+                            slotProps={{
+                              textField: {
+                                size: "small",
+                                placeholder: "Select From Date",
+                                // error=!!errors.passingYear,
+                                // helperText=errors.passingYear?.message
+                              },
+                            }}
+                          />
+                        </>
+                      )}
+                    />
+                  </LocalizationProvider>
+                </Grid>
 
                 {/* Skills */}
                 <Grid item xs={12}>
@@ -319,7 +379,8 @@ export default function JobseekerEducation() {
                         multiple
                         freeSolo
                         size="small"
-                        options={SKILL_OPTIONS} // Dummy data
+                        options={skillMaster}
+                        getOptionLabel={(option) => option.name}
                         value={value || []}
                         onChange={(event, newValue) => onChange(newValue)} // Update field value
                         renderInput={(params) => (

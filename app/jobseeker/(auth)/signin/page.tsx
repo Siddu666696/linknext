@@ -70,7 +70,7 @@ const SignIn = () => {
       if (userData) {
         dispatch(storeJobseekerProfile(userData?.getProfile));
       } 
-      dispatch(openSnackbar({ message: "Login Successful", severity: false }));
+      dispatch(openSnackbar({ message: "Login Successful", severity: "success" }));
 
       if (user && !userData) {
         router.push("/registration");
@@ -82,7 +82,7 @@ const SignIn = () => {
       dispatch(
         openSnackbar({
           message: error.message || "Error logging in",
-          severity: true,
+          severity: "error",
         })
       );
     } finally {

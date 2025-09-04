@@ -139,11 +139,23 @@ export const getCareerProfilePercentage_Query = /* GraphQL */ `
   }
 `;
 
-export const courseId_Query = /* GraphQL */ `
-  query GetCourseMaster {
-    getCourseMaster {
-      cmID
-      name
+export const courseMaster_Query = /* GraphQL */ `
+  query GetCourse($industry: String!, $qualification: String!) {
+    getCourse(industry: $industry, qualification: $qualification) {
+      
+      course
+    }
+  }
+`;
+
+export const getSpecialization_Query = /* GraphQL */ `
+  query GetSpecialization($course: String!, $industry: String!, $qualification: String!, $specialization: String!) {
+    getSpecialization(course: $course, industry: $industry, qualification: $qualification, specialization: $specialization) {
+      course
+      emID
+      healthcareIndustry
+      qualification
+      specialization
     }
   }
 `;
