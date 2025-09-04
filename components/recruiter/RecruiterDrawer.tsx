@@ -27,11 +27,12 @@ const RecruiterDrawer = () => {
   return (
     <Box
       sx={{
-        width: { xs: "100%", md: 250 },
+        width: { xs: "100%", md: 170,lg:230 },
         bgcolor: "#fff",
         minHeight: "100vh",
-        p: 2,
+        py: 2,
         borderRight: "1px solid #ddd",
+        display:{xs:"none",md:"block"}
       }}
     >
       <List>

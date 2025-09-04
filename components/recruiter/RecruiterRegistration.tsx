@@ -8,11 +8,13 @@ import {
   Checkbox,
   FormControlLabel,
   Button,
-  Grid,
   InputLabel,
   InputAdornment,
   Autocomplete,
+  Container,
+  Box,
 } from "@mui/material";
+import Grid from '@mui/material/Grid2';
 import { LocationOn as LocationIcon } from "@mui/icons-material";
 import { validationSchema } from "@/schema/recruiterSchema";
 import { getHCIIndustry, getHospitalTypes } from "@/lib/api/recruiter/queries";
@@ -23,6 +25,8 @@ import { addHospital } from "@/lib/api/recruiter/mutations";
 import { openSnackbar } from "@/redux/features/snackbarSlice";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
+import RecruiterRegistration from "../../public/assets/images/leftsideimg.svg"
+import Image from "next/image";
 
 const RegisterHospital = () => {
   const user = useAppSelector((state) => state.auth.user);
@@ -40,16 +44,16 @@ const RegisterHospital = () => {
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      industry: undefined,
-      location: undefined,
-      areaName: undefined,
-      pinCode: undefined,
-      fullName: undefined,
+      industry: null,
+      location: null,
+      areaName: "",
+      pinCode: "",
+      fullName: "",
       mobile: undefined,
       gstNumber: undefined,
       email: user?.signInDetails?.loginId,
-      hospitalName: undefined,
-      hospitalDisplayName: undefined,
+      hospitalName: "",
+      hospitalDisplayName: "",
       hospitalType: undefined,
       termsConditionAndPrivacy: false,
     },
@@ -62,6 +66,8 @@ const RegisterHospital = () => {
   const [locationData, setLocationData] = useState([]);
   const [cityData, setCityData] = useState([]);
   const [hospitalType, setHospitalType] = useState([]);
+  console.log(industryData,"industryData");
+  console.log(selectedIndustry,"selectedIndustry");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -111,8 +117,12 @@ const RegisterHospital = () => {
   }, [debouncedLocationSearch]);
 
   const onSubmit = async (data) => {
+    console.log(data,"data");
+    
     try {
       const response = await addHospital(data);
+      console.log(response,"response");
+      
       if (response) {
         dispatch(
           openSnackbar({
@@ -133,13 +143,28 @@ const RegisterHospital = () => {
     }
   };
 
+  console.log(watch("industry"),"industry");
+  
+
   return (
-    <Grid container p={2} spacing={2} my={15}>
-      <Grid item xs={12} md={6}></Grid>
-      <Grid item xs={12} md={6}>
+    <>  
+    <Box sx={{display:"flex"}}>
+    <Grid>
+    <Box sx={{display:{xs:"none",md:"block"},width:{md:"500px",lg:"750px"},height:{md:"1500px",lg:"1350px"}}}>
+      <Image style={{width:"100%",height:"100%",flex:1}} src={RecruiterRegistration} alt="RecruiterRegistration"></Image>
+    </Box>
+    </Grid>
+    <Container sx={{ flex: 1}}>
+    <Grid spacing={2} size={{md:6} }>
+      <Grid size={{lg:12}}>
+        <Box sx={{color:"#395987",fontWeight:500,fontSize:"26px",textAlign:"center",fontFamily:"Open-sans !important",my:"20px"}}>
+           <span>Recruiter Registration</span>
+        </Box>
+      </Grid>
+      <Grid size={{xs:12,md:6,lg:12}}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
+          <Grid container spacing={2} sx={{display:"flex",justifyContent:"center"}}>
+            <Grid size={{xs:12,lg:10}}>
               <InputLabel>
                 Industry <span style={{ color: "red" }}>*</span>
               </InputLabel>
@@ -173,7 +198,7 @@ const RegisterHospital = () => {
 
             {selectedIndustry?.industry && (
               <>
-                <Grid item xs={12}>
+                <Grid size={{xs:12,lg:10}}>
                   <InputLabel>
                     {selectedIndustry?.industry} Name{" "}
                     <span style={{ color: "red" }}>*</span>
@@ -188,13 +213,13 @@ const RegisterHospital = () => {
                         fullWidth
                         size="small"
                         error={!!errors.hospitalName}
-                        helperText={errors.hospitalName?.message || ""}
+                        helperText={errors.hospitalName ? `${selectedIndustry?.industry} name is required`: ""}
                       />
                     )}
                   />
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={{xs:12,lg:10}}>
                   <InputLabel>
                     {selectedIndustry?.industry} Display Name{" "}
                     <span style={{ color: "red" }}>*</span>
@@ -209,14 +234,14 @@ const RegisterHospital = () => {
                         fullWidth
                         size="small"
                         error={!!errors.hospitalDisplayName}
-                        helperText={errors.hospitalDisplayName?.message || ""}
+                        helperText={errors.hospitalDisplayName ? `${selectedIndustry?.industry} Display name is required` :""}
                       />
                     )}
                   />
                 </Grid>
 
                 {selectedIndustry?.industry === "Hospital" && (
-                  <Grid item xs={12}>
+                  <Grid size={{xs:12,lg:10}}>
                     <InputLabel>
                       Hospital Type <span style={{ color: "red" }}>*</span>
                     </InputLabel>
@@ -253,7 +278,7 @@ const RegisterHospital = () => {
               </>
             )}
 
-            <Grid item xs={12} md={12}>
+            <Grid size={{xs:12,lg:10}}>
               <InputLabel sx={{ marginBottom: 1 }}>
                 Location <span style={{ color: "red" }}>*</span>
               </InputLabel>
@@ -301,7 +326,7 @@ const RegisterHospital = () => {
               />
             </Grid>
 
-            <Grid item xs={12} md={12}>
+            <Grid size={{xs:12,lg:10}}>
               <InputLabel>Area Name</InputLabel>
               <Controller
                 name="areaName"
@@ -319,7 +344,7 @@ const RegisterHospital = () => {
                 )}
               />
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid size={{xs:12,lg:10}}>
               <InputLabel>Pincode</InputLabel>
               <Controller
                 name="pinCode"
@@ -333,11 +358,24 @@ const RegisterHospital = () => {
                     {...register("pinCode")}
                     error={!!errors.pinCode}
                     helperText={errors.pinCode?.message}
-                  />
+                    slotProps={{
+                      input:{
+                        inputProps:{
+                          maxLength:6,
+                          inputMode:"numeric",
+                          pattern:"[0-9]*"
+                        }
+                      }
+                    }}
+                     onChange={(e) => {
+                         const onlyNums = e.target.value.replace(/\D/g, ""); // allow only numbers
+                         field.onChange(onlyNums);
+                    }}
+                  />  
                 )}
               />
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid size={{xs:12,lg:10}}>
               <InputLabel>Recruiter Name</InputLabel>
               <Controller
                 name="fullName"
@@ -355,12 +393,12 @@ const RegisterHospital = () => {
                 )}
               />
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid size={{xs:12,lg:10}}>
               <InputLabel sx={{ marginBottom: 1 }}>
                 Mobile Number<span style={{ color: "red" }}>*</span>
               </InputLabel>
               <Grid container>
-                <Grid item xs={2} md={2}>
+                <Grid size={{xs:3,lg:3}}>
                   <TextField
                     variant="outlined"
                     defaultValue="+91"
@@ -372,7 +410,7 @@ const RegisterHospital = () => {
                         borderRadius: "4px 0px 0px 4px !important",
                       },
                     }}
-                    InputProps={{
+                    slotProps={{
                       sx: {
                         ".MuiOutlinedInput-input": {
                           padding: "10.5px 14px",
@@ -384,7 +422,7 @@ const RegisterHospital = () => {
                     }}
                   />
                 </Grid>
-                <Grid item xs={10} md={10}>
+                <Grid size={{xs:9}}>
                   <TextField
                     sx={{
                       color: "var(--clr-blue-footer)",
@@ -392,19 +430,25 @@ const RegisterHospital = () => {
                         borderRadius: "0px 4px 4px 0px !important",
                       },
                     }}
-                    InputProps={{
-                      sx: {
-                        ".MuiOutlinedInput-input": {
-                          padding: "10.5px 14px",
-                        },
-                      },
-                    }}
+                    // InputProps={{
+                    //   sx: {
+                    //     ".MuiOutlinedInput-input": {
+                    //       padding: "10.5px 14px",
+                    //     },
+                    //   },
+                    // }}
                     size="small"
                     fullWidth
                     type="text"
                     autoComplete="off"
                     placeholder="Enter Mobile Number"
-                    inputProps={{ maxLength: 10 }}
+                    slotProps={{
+                      input:{
+                        inputProps:{
+                          maxLength:10
+                        }
+                      }
+                    }}
                     onKeyDown={(e) => {
                       const isValidKey =
                         /^\d$/.test(e.key) ||
@@ -434,7 +478,7 @@ const RegisterHospital = () => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid size={{xs:12,lg:5}}>
               <InputLabel>
                 Email<span style={{ color: "red" }}>*</span>
               </InputLabel>
@@ -458,21 +502,25 @@ const RegisterHospital = () => {
                 )}
               />
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid size={{xs:12,lg:5}}>
               <InputLabel>GSTN no</InputLabel>
-              <TextField fullWidth size="small" {...register("gstNumber")} />
+              <TextField fullWidth size="small" sx={{ my: 1 }} 
+              {...register("gstNumber")} 
+              error={!!errors.gstNumber}
+              helperText={errors.gstNumber?.message}
+               />
             </Grid>
-            <Grid item xs={12} md={12}>
+            <Grid size={{xs:12,md:12,lg:10}}>
               <FormControlLabel
                 control={<Checkbox {...register("termsConditionAndPrivacy")} />}
                 label="I accept the terms and conditions"
               />
               {errors.termsConditionAndPrivacy && (
-                <p>{errors.termsConditionAndPrivacy.message}</p>
+                <p style={{color:"red",marginTop:"15px"}}>{errors.termsConditionAndPrivacy.message}</p>
               )}
             </Grid>
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary">
+            <Grid size={{md:12,lg:10}} sx={{display:"flex",justifyContent:"center"}}>
+              <Button type="submit" variant="contained" color="primary" sx={{bgcolor:"#395587",width:{xs:"250px",md:"350px"},borderRadius:"50px", fontWeight:"500",textTransform: 'capitalize',p:"8px",mb:5}}>
                 Register Hospital
               </Button>
             </Grid>
@@ -480,6 +528,9 @@ const RegisterHospital = () => {
         </form>
       </Grid>
     </Grid>
+    </Container>
+    </Box>
+    </>
   );
 };
 

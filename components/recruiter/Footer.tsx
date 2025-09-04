@@ -1,4 +1,5 @@
-import { Box, Grid, Typography, IconButton } from "@mui/material";
+import { Box,Typography, IconButton} from "@mui/material";
+import Grid from '@mui/material/Grid2';
 import React from "react";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
@@ -6,8 +7,16 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import Image from "next/image";
 import HeaderNew from "../../public/assets/images/HeaderNew.svg";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Footer = () => {
+
+  const location = usePathname()
+  console.log(location,"location footer")
+
+  const hideFooterRoutes = ["/recruiter/registration"]
+  const hideFooter = hideFooterRoutes.includes(location)
+
  const footerLinks = [
     {
       title: "Section 1",
@@ -40,22 +49,26 @@ const Footer = () => {
       ],
     },
   ]; 
+
+  if(hideFooter) return null;
   return (
     <Box
       sx={{
-        p: 5,
-        height: "40vh",
+        p:{xs:2,md:2,lg:5},
+        height: "100%",
         backgroundColor: "#e3f2fd",
         width: "100%",
       }}
     >
       <Grid container spacing={2} alignItems="flex-start" flexWrap="wrap">
-        <Grid item xs={12} md={3}>
+        <Grid size={{xs:12,md:3}}>
+          <Box sx={{display:{xs:"none",md:"block"}}}>
           <Image width={200} height={60} alt="medlink" src={HeaderNew} />
-          <Typography variant="body2" sx={{ mb: 2 }}>
+          </Box>
+          <Typography variant="body2" sx={{ my: 2,textAlign:{xs:"center",md:"start"},color:"#395987",fontWeight:550,pl:1 }}>
             Follow Us:
           </Typography>
-          <Box sx={{ display: "flex", gap: 1 }}>
+          <Box sx={{ display: "flex",justifyContent:{xs:"space-evenly",md:"start",lg:"start"}}}>
             <IconButton
               color="primary"
               href="https://facebook.com"
@@ -104,8 +117,8 @@ const Footer = () => {
           </Box>
         </Grid>
         {footerLinks.map((section, index) => (
-  <Grid item xs={12} md={2} key={index}>
-    <Box>
+  <Grid size={{xs:4,md:2}} key={index}>
+    <Box sx={{pl:1}}>
       {section.links.map(({ label, href }) => (
         <Link href={href} key={label} passHref>
           <Typography
@@ -147,19 +160,22 @@ const Footer = () => {
             )}
           </Box>
         </Grid> */}
-        <Grid item xs={12} md={3} gap={3}>
-          <Typography variant="subtitle1" fontWeight={600} mt={2}>
+        <Grid size={{xs:12,md:3}} gap={1}>
+          <Box sx={{display:"flex",flexDirection:{xs:"column"},alignItems:"center"}}>
+          <Typography variant="subtitle1" fontWeight={500} mt={2} color="#395987" fontSize="16px" textAlign="left">
             Get our mobile app
           </Typography>
-          <Typography sx={{ mb: 1, fontSize: 12 }}>
+          <Typography sx={{ mt: 1,mb:2, fontSize: 12,color:"#395987" }}>
             Apply to jobs on the go from our mobile app
           </Typography>
+          </Box>
           <Box
             sx={{
-              display: "flex",
+              display: "flex", 
               flexDirection: "row",
               gap: 1,
               flexWrap: "wrap",
+              justifyContent:"center"
             }}
           >
             <Box
@@ -190,6 +206,7 @@ const Footer = () => {
               />
             </Box>
           </Box>
+          
         </Grid>
       </Grid>
     </Box>

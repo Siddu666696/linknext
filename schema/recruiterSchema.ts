@@ -56,8 +56,8 @@ export const validationSchema = yup.object().shape({
   hospitalName: yup.string().required("Industry name is required"),
   hospitalDisplayName: yup.string().required("Industry name is required"),
   hospitalType: yup.string().when("industry", {
-    is: (industry) => industry.industry === "Hospital",
-    then: () => yup.string().required("Industry name is required"),
+    is: (industry) => industry?.industry === "Hospital",
+    then: () => yup.string().required("Hospital Type is required"),
   }),
   location: yup
     .object()
@@ -75,21 +75,28 @@ export const validationSchema = yup.object().shape({
   fullName: yup.string().required("Full name is required"),
   mobile: yup
     .string()
-    .required("Contact number is required")
+    .required("Mobile number is required")
     .matches(/^[0-9]+$/, "Contact number must be numeric")
-    .min(10, "Contact number must be at least 10 digits"),
+    .min(10, "Mobile number must be at least 10 digits"),
   email: yup
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  gstNumber: yup
-    .string()
-    .matches(
-      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/,
-      "Invalid GSTIN format. Ensure it has 15 valid characters."
-    )
-    .notRequired()
-    .nullable(),
+  // gstNumber: yup
+  //   .string()
+  //   .matches(
+  //     /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{3}$/,
+  //     "Invalid GSTIN format. Ensure it has 15 valid characters."
+  //   )
+  //   .notRequired()
+  //   .nullable(),
+     gstNumber: yup.string()
+      .nullable()
+      .test("is-valid-gst", "Invalid GSTIN format. Ensure it has 15 valid characters.", (value) => {
+        if (!value) return true; // ✅ optional
+        const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        return gstRegex.test(value);
+      }),
   termsConditionAndPrivacy: yup
     .boolean()
     .oneOf([true], "You must accept the terms and conditions"),
