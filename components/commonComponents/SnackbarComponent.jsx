@@ -16,17 +16,17 @@ const SnackbarComponent = () => {
   
   return (
     <Snackbar
-      open={snackbar.open}
+      open={snackbar?.open}
       autoHideDuration={2000}
       onClose={handleClose}
       anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
     >
-      {snackbar.open && ( <Alert
+      {snackbar?.open && ( <Alert
         onClose={() => handleClose}
-        severity={snackbar.severity ||"success"}
+        severity={snackbar?.severity ||"success"}
         variant="filled"
       >
-        {snackbar.message}
+        {snackbar?.message}
       </Alert>)}
     </Snackbar>
   );

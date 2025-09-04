@@ -80,15 +80,23 @@ const SignIn = () => {
         }
       } catch (error) {
         console.error(error);
-        router.push("/recruiter/registration");
+        dispatch(
+          openSnackbar({
+            message: "Error logging in",
+            severity: "error",
+          })
+        );
+        // router.push("/recruiter/registration");
       }
     } catch (error) {
       dispatch(
         openSnackbar({
-          message: error.message || "Error logging in",
-          severity: true,
+          message: "Error logging in",
+          severity: "error",
         })
       );
+      console.error("Error during sign-in:", error);
+      
     } finally {
       stopLoading();
     }

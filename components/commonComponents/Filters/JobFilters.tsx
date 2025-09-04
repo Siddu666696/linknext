@@ -80,12 +80,11 @@ const filterKeywordStyle = {
 const checkBoxStyle = {
   pt: 0,
   color: "#C7D3E3",
-  "&.Mui-checked": { color: "var(--clr-blue-footer)" },
 };
 
 const JobFilter = (props) => {
   const {
-    filters,
+    filters={},
     // openedItemId,
     // handleClick,
     handleClearFilters,
@@ -134,18 +133,23 @@ const JobFilter = (props) => {
       setOpenedItemId(clickedItemId);
     }
   };
-const handleCheckboxChange = (filterKey: string, value: string, isChecked: boolean) => {
-  const prevValues = filters?.[filterKey] || [];
-  const updatedValues = isChecked
-    ? prevValues.filter((item: string) => item !== value)
-    : [...prevValues, value];
+  const handleCheckboxChange = (
+    filterKey: string,
+    value: string,
+    isChecked: boolean
+  ) => {
+    const prevValues = filters?.[filterKey] || [];
+    const updatedValues = isChecked
+      ? prevValues.filter((item: string) => item !== value)
+      : [...prevValues, value];
 
-  handleApplyFilters({
-    [filterKey]: updatedValues,
-  });
-};
+    handleApplyFilters({
+      [filterKey]: updatedValues,
+    });
+  };
 
-
+  console.log(aggregators, "aggregators in JobFilter");
+  console.log(filters, "filters in JobFilter");
 
   return (
     <Box>
@@ -195,7 +199,7 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
           <AccordionDetails>
             <Box sx={{ p: 1 }}>
               {(aggregators?.Location || []).slice(0, 5).map((lc, index) => {
-                const locationKey = lc?.key?.toLowerCase();
+                const locationKey = lc?.key;
                 const isChecked = filters?.location?.includes(locationKey);
 
                 return (
@@ -286,7 +290,9 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
           onClose={handleClose}
           title={anchorEl?.id || ""}
           options={anchorEl?.id ? aggregators[anchorEl?.id] : []}
-          selectedOptions={anchorEl?.id ? filters[anchorEl?.id] : []}
+          selectedOptions={
+            anchorEl?.id ? filters[anchorEl?.id?.toLowerCase()] : []
+          }
           onApply={handleApplyFilters}
           allowMultiSelect={true}
         />
@@ -440,7 +446,6 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
                 ? regex.test(skillKey)
                 : false;
 
-
               return (
                 <Box
                   key={sr.key}
@@ -524,10 +529,15 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
                 sx={{ display: "flex", alignItems: "flex-start" }}
               >
                 <Checkbox
-                  onChange={() => handleCheckboxChange("specialization", sr?.key, filters?.specializationFilter?.includes(sr?.key))}
+                  onChange={() =>
+                    handleCheckboxChange(
+                      "specialization",
+                      sr?.key,
+                      filters?.specialization?.includes(sr?.key)
+                    )
+                  }
                   checked={
-                    filters?.specializationFilter?.includes(sr?.key) === true &&
-                    true
+                    filters?.specialization?.includes(sr?.key) === true && true
                   }
                   name={sr?.key}
                   sx={{ ...checkBoxStyle }}
@@ -535,7 +545,7 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
                 <Typography
                   sx={{
                     color:
-                      filters?.specializationFilter?.includes(sr?.key) === true
+                      filters?.Specialization?.includes(sr?.key) === true
                         ? "#000000"
                         : "#6F7482",
                   }}
@@ -544,9 +554,10 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
                 </Typography>
               </Box>
             ))}
-            {filters?.specialization?.length > 5 && (
+            {aggregators?.Specialization?.length > 5 && (
               <Typography
-                onClick={(e) => setViewAllOptions(e.currentTarget)}
+                id="Specialization"
+                onClick={(e) => handleOpen(e)}
                 sx={{ ...viewAllStyle }}
               >
                 View More
@@ -598,9 +609,15 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
                 sx={{ display: "flex", alignItems: "flex-start" }}
               >
                 <Checkbox
-                  onChange={() => handleCheckboxChange("hospital", hp?.key, filters?.hospitalFilter?.includes(hp?.key))}
+                  onChange={() =>
+                    handleCheckboxChange(
+                      "hospital",
+                      hp?.key,
+                      filters?.hospital?.includes(hp?.key)
+                    )
+                  }
                   checked={
-                    filters?.hospitalFilter?.includes(hp?.key) === true && true
+                    filters?.hospital?.includes(hp?.key) === true && true
                   }
                   name={hp?.key}
                   sx={{ ...checkBoxStyle }}
@@ -608,7 +625,7 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
                 <Typography
                   sx={{
                     color:
-                      filters?.hospitalFilter?.includes(hp?.key) === true
+                      filters?.hospital?.includes(hp?.key) === true
                         ? "#000000"
                         : "#6F7482",
                     whiteSpace: "nowrap",
@@ -620,7 +637,8 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
             ))}
             {aggregators?.Hospitals?.length > 5 && (
               <Typography
-                onClick={(e) => setViewAllOptions(e.currentTarget)}
+                id="Specialization"
+                onClick={(e) => handleOpen(e)}
                 sx={{ ...viewAllStyle }}
               >
                 View More
@@ -674,16 +692,22 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
               >
                 <Checkbox
                   sx={{ ...checkBoxStyle }}
-                  onChange={() => handleCheckboxChange("education", sr?.key, filters?.educationFilter?.includes(sr?.key))}
+                  onChange={() =>
+                    handleCheckboxChange(
+                      "education",
+                      sr?.key,
+                      filters?.education?.includes(sr?.key)
+                    )
+                  }
                   checked={
-                    filters?.educationFilter?.includes(sr?.key) === true && true
+                    filters?.education?.includes(sr?.key) === true && true
                   }
                   name={sr}
                 />
                 <Typography
                   sx={{
                     color:
-                      filters?.educationFilter?.includes(sr?.key) === true
+                      filters?.education?.includes(sr?.key) === true
                         ? "#000000"
                         : "#6F7482",
                   }}
@@ -692,9 +716,12 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
                 </Typography>
               </Box>
             ))}
-            {filters?.education?.length > 5 && (
+            {
+            aggregators?.Education?.length > 5 && 
+            (
               <Typography
-                onClick={(e) => setViewAllOptions(e.currentTarget)}
+                id="Education"
+                onClick={(e) => handleOpen(e)}
                 sx={{ ...viewAllStyle }}
               >
                 View More
@@ -739,7 +766,6 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
           <Box
             sx={{
               p: 1,
-            
             }}
           >
             {aggregators?.JobType?.map((jobType, index) => (
@@ -748,10 +774,15 @@ const handleCheckboxChange = (filterKey: string, value: string, isChecked: boole
                 sx={{ display: "flex", alignItems: "flex-start" }}
               >
                 <Checkbox
-                  onChange={() => handleCheckboxChange("jobType", jobType?.key, filters?.jobTypeFilter?.includes(jobType?.key))}
+                  onChange={() =>
+                    handleCheckboxChange(
+                      "jobType",
+                      jobType?.key,
+                      filters?.jobTypeFilter?.includes(jobType?.key)
+                    )
+                  }
                   checked={
-                    filters?.jobType?.includes(jobType?.key) === true &&
-                    true
+                    filters?.jobType?.includes(jobType?.key) === true && true
                   }
                   name={jobType?.key}
                   sx={{ ...checkBoxStyle }}

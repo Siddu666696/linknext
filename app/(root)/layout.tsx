@@ -1,4 +1,6 @@
 "use client";
+import Header from "@/components/commonComponents/Header";
+import Footer from "@/components/recruiter/Footer";
 import UseJobseekerProfile, {
   getJobseekerProfile,
   getUser,
@@ -31,7 +33,9 @@ const Layout = ({
   }, []);
   // const { loading, error, authenticated } = UseJobseekerProfile();
 
-  return <>{children}</>;
+  return <><Header />
+  {children}
+  <Footer/></>;
 };
 
 export default Layout;

@@ -10,6 +10,23 @@ export const removeJobFromSavedList_Mutation = /* GraphQL */ `
 `;
 export const applyForAJob_Mutation = /* GraphQL */ `
   mutation applyForAJob($vacancyID: Int!) {
-    applyForAJob(vacancyID: $vacancyID) 
+    applyForAJob(vacancyID: $vacancyID)
   }
 `;
+export const updateDb_Mutation =
+  /* GraphQL */
+  `
+    mutation updateDb(
+      $phone: String,
+      $phoneVerified: Boolean,
+      $email: String,
+      $emailVerified: Boolean,
+    ) {
+      updateDb(
+        phone: $phone,
+        phoneVerified: $phoneVerified,
+        email: $email,
+        emailVerified: $emailVerified,
+      )
+    }
+  `;

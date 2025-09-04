@@ -595,14 +595,14 @@ type Vacancy ={
 	status: string
 }
 
-type blog ={
+export type Blog ={
 	blogId: number
 	title: string
 	briefDescription: string
 	category: string
 	imageLink: string
 	description: string
-	relatedBlogs: [blog]
+	relatedBlogs: [Blog]
 	keywords: string
 }
 

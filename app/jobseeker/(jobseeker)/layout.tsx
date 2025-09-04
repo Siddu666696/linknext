@@ -8,6 +8,7 @@ import { toggleDrawerState } from "@/redux/features/drawerSlice";
 import Sidebar from "../../../components/jobseeker/Sidebar";
 import UseJobseekerProfile from "@/hooks/UseJobseekerProfile";
 import { ConfigureJobseekerAmplify } from "@/lib/api/jobseeker/queries";
+import Header from "@/components/commonComponents/Header";
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { loading, error, authenticated } = UseJobseekerProfile();
   const dispatch = useAppDispatch();
@@ -28,13 +29,14 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <JobseekerNavbar
+      {/* <JobseekerNavbar
         toggle={() => {
           handleToggle();
           dispatch(toggleDrawerState());
         }}
-      />
-      <Box mt={7}>{children}</Box>
+      /> */}
+      <Header/>
+      <Box >{children}</Box>
       {openDrawer && <Sidebar open={openDrawer} />}
     </>
   );
