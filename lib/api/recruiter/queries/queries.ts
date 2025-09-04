@@ -359,3 +359,79 @@ export const getActiveSubscriptions_Query = /* GraphQL */ `
     }
   }
 `;
+export const getApplicantsListByJob_Query = /* GraphQL */ `
+  query getApplicantsListByJob($vacancyID: Int!){
+    getApplicantsListByJob(vacancyID: $vacancyID){
+      appliedAt
+      callStatus
+      companyName
+      designation
+      edu
+      exp
+      vacancyID
+      userID
+      status
+      selectionStatus
+      noticePeriod
+      name
+      location
+      jaID
+      isViewed
+      interested
+    }
+  }
+`;
+export const getJobPostPrimarySpecialization_Query = /* GraphQL */ `
+  query getJobPostPrimarySpecialization($vacancyID: Int!){
+    getJobPostPrimarySpecialization(vacancyID: $vacancyID){
+    vacancyID
+          type
+          specializationID
+          specialization
+          jpsID
+      interested
+    }
+  }
+`;
+export const getAVacancy_Query = /* GraphQL */ `
+  query getAVacancy($vacancyID: Int!){
+    getAVacancy(vacancyID: $vacancyID){
+      vacancyType
+              vacancyID
+              userAddedJobRoleID
+              systemUser
+              skill
+              secondarySpecialization
+              savedJob
+              qualification
+              primarySpecialization
+              postedOn
+              otherJobRole
+              numberOfVacancies
+              systemUserHospital
+              minimumSalary
+              maximumSalary
+              logo
+              location
+              jobRoleID
+              jobRole
+              lastDateToApply
+              isSalaryDisclosed
+              hospitalName
+              hospitalID
+              expiredOn
+              expMin
+              expMax
+              employmentType
+              description
+              department
+              announcedDate
+              otherJobRole
+              includeWalkInInterviewDetails
+              course
+              gender
+              shift
+              status
+    }
+  }
+`;

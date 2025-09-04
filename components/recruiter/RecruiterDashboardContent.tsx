@@ -218,13 +218,18 @@ const reminderNotificationIcons = [
 
       {/* Cards */}
       <Grid container spacing={2} mx={1} my={2} width="100%">
-        <Grid item xs={12} md={6}>
-          <Card>
-            <Box
-              sx={{ display: "flex", justifyContent: "space-between", p: 5 }}
-            >
-              <Box sx={{ mx: 2, my: 2 }}>
-                <Typography sx={{ fontSize: 20, my: 2 }}>Post a Job</Typography>
+        <Grid item xs={12} md={6} sx={{ display: "flex"}}>
+          <Card 
+           sx={{
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      width: "100%",
+      minHeight: { xs: 100, md: 100 }, p: 3 }}
+          >
+            <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={8}> 
+               <Typography sx={{ fontSize: 20, my: 2 }}>Post a Job</Typography>
                 <Box sx={{ display: "flex", flexDirection: "row", my: 2 }}>
                   <Typography>Activated On : </Typography>
                   <Typography> {activate}</Typography>
@@ -233,20 +238,20 @@ const reminderNotificationIcons = [
                   <Typography>Valid Till : </Typography>
                   <Typography> {valid}</Typography>
                 </Box>
-                <Button  onClick={() => router.push("/recruiter/post-job")} variant="contained">Post</Button>
-              </Box>
-              <Box
+              </Grid>
+              <Grid item xs={12} md={4}>
+            <Box
                 sx={{
                   position: "relative",
                   display: "inline-flex",
-                  width: { xs: 100, md: 200 },
-                  height: { xs: 100, md: 200 },
+                  width: { xs: 180, md: 180 },
+                  height: { xs: 180, md: 180 },
                 }}
               >
                 <CircularProgress
                   variant="determinate"
                   value={100}
-                  size={200}
+                  size={180}
                   thickness={8}
                   sx={{
                     position: "absolute",
@@ -259,7 +264,7 @@ const reminderNotificationIcons = [
                 <CircularProgress
                   variant="determinate"
                   value={(creditsLeft / totalCredits) * 100}
-                  size={200}
+                  size={180}
                   thickness={8}
                   sx={{
                     position: "absolute",
@@ -282,8 +287,13 @@ const reminderNotificationIcons = [
                     Credits left {creditsLeft} of {totalCredits}
                   </Typography>
                 </Box>
-              </Box>
             </Box>
+              </Grid>
+              <Box
+              sx={{ display: "flex", justifyContent: "space-between", p:1, flexGrow:1}}>
+                <Button  onClick={() => router.push("/recruiter/post-job")} variant="contained">Post</Button>
+              </Box>
+              </Grid>
           </Card>
         </Grid>
 
