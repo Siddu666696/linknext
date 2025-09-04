@@ -8,6 +8,7 @@ import {
   Avatar,
   Badge,
   Button,
+  Collapse,
   IconButton,
   List,
   ListItem,
@@ -29,15 +30,26 @@ import Image from "next/image";
 import HeaderNew from "../../../../public/assets/images/HeaderNew.svg";
 import { removeRecruiterDeviceToken } from "@/lib/api/recruiter/mutations";
 import { openSnackbar } from "@/redux/features/snackbarSlice";
+import MenuIcon from '@mui/icons-material/Menu';
+
 
 const RecruiterNavbar = React.memo(function RecruiterNavbar({
   searchInputRef,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [hospitalName, setHospitalName] = useState("");
+  // const [openCollapse,setOpenCollapse] = useState(false)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  
+    const toggleMobileNav = () => setMobileNavOpen((prev) => !prev);
   const router = useRouter();
   // const dispatch = useAppDispatch();
   const location = usePathname();
+  console.log(location);
+  
+  const hideNavbarRoutes = ["/recruiter/registration"]
+
+  const hideNavbar = hideNavbarRoutes.includes(location)
   const profileDetails = useSelector(
     (state) => state?.profileDetails?.profileDetails
   );
@@ -150,6 +162,7 @@ const RecruiterNavbar = React.memo(function RecruiterNavbar({
     }
   };
 
+  if (hideNavbar) return null;
   return (
     <Box
       sx={{
@@ -179,8 +192,20 @@ const RecruiterNavbar = React.memo(function RecruiterNavbar({
               width: "100%",
             }}
           >
+            <Box sx={{display:{xs:"block",sm:"none",md:"none"}}}>
+            <IconButton
+            size="large"
+            edge="start"
+            color="blue"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+            onClick={toggleMobileNav}
+          >
+            <MenuIcon />
+          </IconButton>
+          </Box>
             {/* Left Section: Logo + Nav Links */}
-            <Box display="flex" alignItems="center">
+            <Box sx={{display:{xs:"none",sm:"flex"}}} alignItems="center">
               {/* <Link href="/recruiter/home" style={{ textDecoration: "none" }}> */}
               <Image width={200} height={60} alt="medlink" src={HeaderNew} />
               {/* </Link> */}
@@ -273,7 +298,7 @@ const RecruiterNavbar = React.memo(function RecruiterNavbar({
             </Box>
 
             {/* Right Section: Profile */}
-            <Box sx={{ display: "flex", flexDirection: "row", my: 2, gap: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "row",justifyContent:"space-around", my: 2, gap: 0 }}>
               {/* <Tooltip title="Open settings"> */}
               {/* <Button
                 size="large"
@@ -284,16 +309,16 @@ const RecruiterNavbar = React.memo(function RecruiterNavbar({
                 color="#000000D9"
               > */}
               <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
-                <IconButton onClick={() => router.push("/recruiter/reminder")}>
+                {/* <IconButton onClick={() => router.push("/recruiter/reminder")}>
                   <AccessAlarmIcon sx={{ color: "black", fontSize: "24px" }} />
-                </IconButton>
+                </IconButton> */}
 
                 <IconButton
                   onClick={() => router.push("/recruiter/notifications")}
                 >
                   <Badge color="error" badgeContent={10 > 9 ? "9+" : 10}>
                     <NotificationsIcon
-                      sx={{ color: "black", fontSize: "24px" }}
+                      sx={{ color: "black", fontSize: "28px" }}
                     />
                   </Badge>
                 </IconButton>
@@ -316,6 +341,7 @@ const RecruiterNavbar = React.memo(function RecruiterNavbar({
               </Box>
               {/* </Button> */}
               <Button
+                sx={{px:{xs:0}}}
                 size="large"
                 edge="end"
                 aria-label="account of current user"
@@ -377,6 +403,25 @@ const RecruiterNavbar = React.memo(function RecruiterNavbar({
             />
           )}
         </Toolbar>
+        <Collapse in={mobileNavOpen} timeout="auto" sx={{ display: { xs: "block", md: "none" }}}>
+        <Box sx={{
+                    display: { xs: "flex", md: "none" },
+                    flexDirection: "column",
+                    backgroundColor: "white",
+                    px: 2,
+                    py: 1,
+                    gap: 1,
+                    color:"#395987"
+                  }}>
+          <Button fullWidth color="inherit">Post a Job Listing</Button>
+          <Button fullWidth color="inherit">Search Candidates</Button>
+          <Button fullWidth color="inherit">Manage Jobs</Button>
+          <Button fullWidth color="inherit">Manage Sub Users</Button>
+          <Button fullWidth color="inherit">Subscription Status</Button>
+          <Button fullWidth color="inherit">Company Profile</Button>
+
+        </Box>
+      </Collapse>
       </AppBar>
     </Box>
   );
