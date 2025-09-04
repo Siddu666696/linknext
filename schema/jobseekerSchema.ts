@@ -116,7 +116,7 @@ export const educationValidationSchema = yup.object().shape({
       .of(yup.string())
       .min(1, 'Select at least one qualification')
       .required('Qualifications are required'),
-    course: yup.string().required('Course is required'),
+    course: yup.object().required('Course is required'),
     otherCourse: yup.string().when('course', {
       is: 'Other',
       then: yup.string().required('Please specify the course'),

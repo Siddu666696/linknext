@@ -32,7 +32,7 @@ const SignupOtp = () => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const username = searchParams.get("username");
+  const username = searchParams.get("username") || "";
   const email = searchParams.get("email");
   const dispatch = useAppDispatch();
   const { loading, startLoading, stopLoading } = UseLoading();
@@ -68,11 +68,11 @@ const SignupOtp = () => {
       });
       await autoSignIn();
       router.push("/jobseeker/registration");
-      dispatch(openSnackbar({ message: "Signup Successful", severity: false }));
+      dispatch(openSnackbar({ message: "Signup Successful", severity: "success" }));
       stopLoading();
     } catch (error) {
       console.error(error);
-      dispatch(openSnackbar({ message: error.message, severity: true }));
+      dispatch(openSnackbar({ message: error.message, severity: "error" }));
       stopLoading();
     }
   };
@@ -106,6 +106,38 @@ const SignupOtp = () => {
     }
   };
 
+  // const startCountdown = () => {
+  //   let countdown = 30;
+  //   setTimer(countdown);
+
+  //   const intervalId = setInterval(() => {
+  //     countdown -= 1;
+  //     setTimer(countdown);
+  //     if (countdown <= 0) {
+  //       clearInterval(intervalId);
+  //       setIsResendDisabled(false);
+  //     }
+  //   }, 1000);
+  // };
+
+  // const handleResendCode = async () => {
+  //   if (isResendDisabled) return;
+
+  //   try {
+  //     startLoading();
+  //     const { destination } = await resendSignUpCode({ username });
+  //     setOtpDestination(destination);
+  //     dispatch(openSnackbar({ message: `OTP sent to ${destination}`, severity: false }));
+
+  //     setIsResendDisabled(true);
+  //     startCountdown();
+  //   } catch (error: any) {
+  //     dispatch(openSnackbar({ message: error.message, severity: true }));
+  //   } finally {
+  //     stopLoading();
+  //   }
+  // };
+  
   return (
     <Box
       sx={{
