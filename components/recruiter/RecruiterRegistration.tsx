@@ -134,7 +134,7 @@ const RegisterHospital = () => {
   };
 
   return (
-    <Grid container p={2} spacing={2}>
+    <Grid container p={2} spacing={2} my={15}>
       <Grid item xs={12} md={6}></Grid>
       <Grid item xs={12} md={6}>
         <form onSubmit={handleSubmit(onSubmit)}>

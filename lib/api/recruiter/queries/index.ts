@@ -3,6 +3,8 @@ import { Amplify } from "aws-amplify";
 import {
   downloadDocument_Query,
   getActiveSubscriptions_Query,
+  getApplicantsListByJob_Query,
+  getAVacancy_Query,
   getCityByState_Query,
   getCourse_Query,
   getDraftJobCount_Query,
@@ -15,6 +17,7 @@ import {
   getHospitalTypes_Query,
   getHospitalUsers_Query,
   getJobPostedBy_Query,
+  getJobPostPrimarySpecialization_Query,
   getJobPostSpecialization_Query,
   getJobRoleAndDepartment_Query,
   getJobStatus_Query,
@@ -409,6 +412,54 @@ export const getActiveSubscriptions = async () => {
   try {
     const response = await client.graphql({
       query: getActiveSubscriptions_Query,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getApplicantsListByJob = async (data) => {
+  ConfigureRecruiterAmplify();
+  // const vacancyID = data;
+  try {
+    const response = await client.graphql({
+      query: getApplicantsListByJob_Query,
+      variables:{
+        // vacancyID:vacancyID
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getJobPostPrimarySpecialization = async (data) => {
+  ConfigureRecruiterAmplify();
+  const vacancyID = data;
+  try {
+    const response = await client.graphql({
+      query: getJobPostPrimarySpecialization_Query,
+      variables:{
+        vacancyID:vacancyID
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getAVacancy = async (data) => {
+  ConfigureRecruiterAmplify();
+  const vacancyID = data;
+  try {
+    const response = await client.graphql({
+      query: getAVacancy_Query,
+      variables:{
+        vacancyID:vacancyID
+      }
     });
     return response.data;
   } catch (error) {
