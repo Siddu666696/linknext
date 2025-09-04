@@ -136,7 +136,7 @@ const IconButton = styled(Box, {
   padding: theme.spacing(0.75),
   borderRadius: "50%",
   border: "1px solid #E4EEF5",
-  backgroundColor: active ? "#395987" : "white",
+  backgroundColor: active ? "#0070b3" : "white",
   cursor: "pointer",
   display: "flex",
   alignItems: "center",
@@ -200,7 +200,7 @@ const MobileHeader = styled(Box)(({ theme }) => ({
 
 const DesktopBreadcrumbs = styled(Box)(({ theme }) => ({
   display: "none",
-  backgroundColor: "#395987",
+  backgroundColor: "#0070b3",
   height: theme.spacing(18),
   marginTop: 0,
   [theme.breakpoints.up("md")]: {
@@ -260,7 +260,7 @@ const JobHeader: React.FC<{
   user?: { name?: string };
 }> = ({ jobDetails, hospitalDetails, logoSrc, onBack, user }) => (
   <>
-    <MobileHeader>
+    {/* <MobileHeader>
       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
         <ArrowBackIosIcon
           onClick={onBack}
@@ -285,7 +285,7 @@ const JobHeader: React.FC<{
           Jobseeker Login
         </ApplyButton>
       )}
-    </MobileHeader>
+    </MobileHeader> */}
 
     <Box
       sx={{
@@ -393,7 +393,7 @@ const JobKeyInfo: React.FC<{
           jobDetails?.maximumSalary || 0,
           jobDetails?.isSalaryDisclosed || false
         )}{" "}
-        Monthly
+      
       </Typography>
     </Box>
   </Box>
@@ -429,7 +429,7 @@ const JobActions: React.FC<{
       {loadingStates.saveJob || loadingStates.deleteSavedJob ? (
         <CircularProgress
           size={ 16}
-          sx={{ color: jobDetails?.savedJob ? "white" : "#395987" }}
+          sx={{ color: jobDetails?.savedJob ? "white" : "#0070b3" }}
         />
       ) : jobDetails?.savedJob ? (
         <BookmarkIcon
@@ -567,8 +567,8 @@ const JobDescriptionSection: React.FC<{ jobDetails: JobDetails }> = ({
     <Typography
       variant="h6"
       sx={{
-        color: "#395987",
-        mb: { xs: 1.5, md: 2 },
+        color: "#0070b3",
+        // mb: { xs: 1.5, md: 2 },
         fontSize: { xs: "1rem", md: "1.25rem", lg: "1.5rem" },
         fontWeight: 600,
       }}
@@ -580,7 +580,9 @@ const JobDescriptionSection: React.FC<{ jobDetails: JobDetails }> = ({
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: { xs: 1.5, md: 2 },
+        gap: { xs: 1.5, md: 4 },
+        fontSize: { xs: "0.875rem", md: "1rem" },
+        
       }}
     >
     <JobDescription
@@ -588,7 +590,7 @@ const JobDescriptionSection: React.FC<{ jobDetails: JobDetails }> = ({
       />
       {/* Job Requirements */}
       <JobInfo jobDetails={jobDetails}/>
-      <Box>
+      {/* <Box>
         <Typography
           sx={{
             fontSize: { xs: "0.875rem", md: "1rem" },
@@ -606,13 +608,13 @@ const JobDescriptionSection: React.FC<{ jobDetails: JobDetails }> = ({
             lineHeight: { xs: 1.5, md: 1.6 },
           }}
         >
-          {/* Add experience details */}
+        
           Experience content here
         </Typography>
-      </Box>
+      </Box> */}
 
       {/* Qualifications */}
-      <Box>
+      {/* <Box>
         <Typography
           sx={{
             fontSize: { xs: "0.875rem", md: "1rem" },
@@ -630,10 +632,10 @@ const JobDescriptionSection: React.FC<{ jobDetails: JobDetails }> = ({
             lineHeight: { xs: 1.5, md: 1.6 },
           }}
         >
-          {/* Add qualification details */}
+        
           Qualification content here
         </Typography>
-      </Box>
+      </Box> */}
     </Box>
   </JobCard>
 );
@@ -651,7 +653,7 @@ const HospitalInfoSection: React.FC<{
     <JobCard>
       <Typography
         sx={{
-          color: "#395987",
+          color: "#0070b3",
           fontWeight: 600,
           fontSize: { xs: "1rem", md: "1.25rem", lg: "1.5rem" },
           mb: { xs: 1.5, md: 2 },
@@ -773,7 +775,7 @@ const SimilarJobsSection: React.FC<{
                   sx={{
                     width: { xs: 48, md: 72 },
                     height: { xs: 48, md: 72 },
-                    bgcolor: "#395987",
+                    bgcolor: "#0070b3",
                     borderRadius: 1,
                     flexShrink: 0,
                   }}
@@ -1044,7 +1046,7 @@ const Snackbar=useSelector((state: RootState) => state.snackbar);
 
             <Box
               sx={{
-                display: { xs: "none", md: "flex" },
+                display: { xs: "flex", md: "flex" },
                 justifyContent: "flex-end",
                 alignItems: "center",
                 mt: { xs: 1.5, md: 2 },
@@ -1080,12 +1082,12 @@ const Snackbar=useSelector((state: RootState) => state.snackbar);
         </StyledContainer>
 
         {/* Sticky Bottom Bar - Mobile Only */}
-        {!isSimilarJobsInView && (
+        {/* {!isSimilarJobsInView && (
           <StickyBottomBar>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <AllInboxIcon sx={{ fontSize: "1.25rem", color: "#395987" }} />
+              <AllInboxIcon sx={{ fontSize: "1.25rem", color: "#0070b3" }} />
               <Typography
-                sx={{ fontSize: "0.75rem", fontWeight: 500, color: "#395987" }}
+                sx={{ fontSize: "0.75rem", fontWeight: 500, color: "#0070b3" }}
               >
                 Similar Jobs
               </Typography>
@@ -1100,7 +1102,7 @@ const Snackbar=useSelector((state: RootState) => state.snackbar);
               //   user={user}
             />
           </StickyBottomBar>
-        )}
+        )} */}
 
         {/* Share Popover */}
         <Popover
@@ -1111,20 +1113,9 @@ const Snackbar=useSelector((state: RootState) => state.snackbar);
         >
           <ShareOptions
             shareUrl={jobUrlWithPath}
+            tagline="Check out this job!"
             handleCopyToClipboard={handleCopyLink}
           />
-          {/* <Box sx={{ p: { xs: 1.5, md: 2 } }}>
-            <Button
-              onClick={handleCopyLink}
-              fullWidth
-              sx={{
-                fontSize: { xs: "0.875rem", md: "1rem" },
-                textTransform: "none",
-              }}
-            >
-              Copy Link
-            </Button>
-          </Box> */}
         </Popover>
 
       

@@ -4,7 +4,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useTransition, useEffect, useState } from "react";
 import JobFilter from "@/components/commonComponents/Filters/JobFilters";
 import JobCard from "@/components/commonComponents/JobCard";
-import { Box, Button, Drawer, IconButton, Pagination } from "@mui/material";
+import { Box, Button, Container, Drawer, IconButton, Pagination } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import Header from "./Header";
 import theme from "@/theme";
@@ -12,6 +12,8 @@ import JobAlert from "./JobAlert";
 import { useSelector } from "react-redux";
 import { Search } from "@mui/icons-material";
 import SearchJobsSubHeader from "./SearchJobsSubHeader";
+import JobSearchBar from "./JobSearchBar";
+import Footer from "../recruiter/Footer";
 
 interface Props {
   initialJobs: any[];
@@ -88,10 +90,12 @@ export default function JobSearchClient({
 
   router.push(`/jobs?${params.toString()}`);
 };
+console.log(pathname,"pathname");
 
   return (
+    <Container>
     <Grid container spacing={2}>
-      <Header />
+      {/* <Header /> */}
       <Grid sx={{ height: "100vh", overflowY: "scroll" }}>
         {/* Desktop Sidebar */}
         <Box
@@ -146,6 +150,7 @@ export default function JobSearchClient({
           <Box>No jobs found.</Box>
         ) : (
           <>
+          {pathname!=="/"&&<JobSearchBar query={initialQuery}/>}
           <SearchJobsSubHeader totalJobs={total} toggleDrawer={toggleDrawer} />
             <Box mb={5} pb={2}>
               {initialJobs?.map((job) => (
@@ -157,7 +162,7 @@ export default function JobSearchClient({
             <Pagination
               sx={{
                 bottom: 0,
-                position: "fixed",
+                position: "Sticky",
                 alignSelf: "center",
                 p: 2,
                 width: "100%",
@@ -176,6 +181,8 @@ export default function JobSearchClient({
       <Grid size={3} sx={{ display: { xs: "none", md: "block" }, p: 2 }}>
         <JobAlert />
       </Grid>
+      {/* <Footer /> */}
     </Grid>
+    </Container>
   );
 }

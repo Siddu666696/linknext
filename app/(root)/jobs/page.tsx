@@ -3,6 +3,7 @@ import JobSearchClient from "@/components/commonComponents/JobSearchClient";
 import { semanticSearchJobs } from "@/lib/api/open/queries/trial";
 import { parseSearchParams } from "@/lib/utils/commonFunctions";
 import { Box } from "@mui/material";
+import { SearchFilters } from "./[...slug]/page";
 
 
 export default async function JobSearchPage({
@@ -23,8 +24,7 @@ export default async function JobSearchPage({
       sp.set(key, value);
     }
   }
-  const initialFilters = parseSearchParams(sp);
-  const filters  = initialFilters;
+  const {  filters }: SearchFilters = parseSearchParams(sp);
   const query = sp?.get("query") || "";
    const page = parseInt(sp.get("page") as string) || 1;
   const limit = parseInt(sp.get("limit") as string) || 10;
@@ -43,7 +43,7 @@ export default async function JobSearchPage({
   const aggregators = data?.sematicSearchJobs?.aggregations || {};
 
   return (
-    <Box className="p-6">
+    <Box p={2}>
       <JobSearchClient
         initialJobs={jobs}
         initialAggregators={aggregators}

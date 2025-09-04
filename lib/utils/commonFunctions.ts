@@ -68,32 +68,32 @@ export function parseSearchParams(searchParams: URLSearchParams): any {
   const filters: any = {};
 
   const location = searchParams?.getAll("location");
-  if (location.length > 0) {
+  if (location?.length > 0) {
     filters.location = location;
   }
 
-  const education = searchParams?.get("education");
-  if (education) {
+  const education = searchParams?.getAll("education");
+  if (education?.length > 0) {
     filters.education = education;
   }
 
-  const jobType = searchParams?.get("jobType");
-  if (jobType) {
+  const jobType = searchParams?.getAll("jobType");
+  if (jobType?.length > 0) {
     filters.jobType = jobType;
   }
 
-  const hospital = searchParams?.get("hospital");
-  if (hospital) {
+  const hospital = searchParams?.getAll("hospital");
+  if (hospital?.length > 0) {
     filters.hospital = hospital;
   }
 
-  const specialization = searchParams?.get("specialization");
-  if (specialization) {
+  const specialization = searchParams?.getAll("specialization");
+  if (specialization?.length > 0) {
     filters.specialization = specialization;
   }
 
   const skills = searchParams?.getAll("skills");
-  if (skills.length > 0) {
+  if (skills?.length > 0) {
     filters.skills = skills;
   }
 

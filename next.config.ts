@@ -36,6 +36,11 @@ const nextConfig: NextConfig = {
         hostname: 'staged-medlink-files.s3.ap-south-1.amazonaws.com',
 
       },
+        {
+        protocol: 'https',
+        hostname: 'medlink-blogs.s3.ap-south-1.amazonaws.com',
+
+      },
     ],
   },
 };

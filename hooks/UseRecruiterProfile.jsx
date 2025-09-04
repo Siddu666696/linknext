@@ -11,6 +11,7 @@ import { storeRecruiterProfile } from "../redux/features/recruiterProfileSlice";
 import { useRouter } from "next/navigation";
 import { getRecruiterProfile } from "@/lib/api/recruiter/queries";
 import { useAppSelector } from "@/lib/utils/reduxHooks";
+import { configureRecruiter } from "@/lib/utils/commonFunctions";
 const UseRecruiterProfile = () => {
   const dispatch = useDispatch();
   const router = useRouter();
@@ -58,6 +59,7 @@ const UseRecruiterProfile = () => {
         } else {
           await signOut();
           dispatch(logout());
+          localStorage.clear();
           router.push("/recruiter/signin");
         }
       } catch (err) {

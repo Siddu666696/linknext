@@ -11,14 +11,16 @@ import EmailIcon from "@mui/icons-material/Email";
 
 type ShareOptionsProps = {
   shareUrl: string;
+  tagline?: string;
   handleCopyToClipboard: () => void;
 };
 
 const ShareOptions: React.FC<ShareOptionsProps> = ({
   shareUrl,
+  tagline="",
   handleCopyToClipboard,
 }) => {
-  const shareText = encodeURIComponent("Check out this job opportunity!");
+  const shareText = encodeURIComponent(tagline);
   const hashtag = encodeURIComponent("#new_job");
 
   const openShareWindow = (url: string) => {

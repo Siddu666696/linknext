@@ -53,11 +53,17 @@ const GenericFilterPopover: React.FC<GenericFilterPopoverProps> = React.memo(
 
     const handleApply = () => {
       switch(title){
-        case "location":
+        case "Location":
           onApply({"location":localSelected});
           break;
         case "Skills":
           onApply({"skills":localSelected});
+          break;
+          case "Education":
+          onApply({"education":localSelected});
+          break;
+          case "Specialization":
+          onApply({"specialization":localSelected});
           break;
           default:
             console.error(title, "is not a valid filter title");
@@ -69,6 +75,8 @@ const GenericFilterPopover: React.FC<GenericFilterPopoverProps> = React.memo(
 
     const open = Boolean(anchorEl);
     const id = open ? "generic-filter-popover" : undefined;
+console.log(selectedOptions, "selectedOptions in GenericFilterPopover");
+
 
     return (
       <Popover
@@ -103,8 +111,9 @@ const GenericFilterPopover: React.FC<GenericFilterPopoverProps> = React.memo(
                 {allowMultiSelect && (
                   <ListItemIcon>
                     <Checkbox
-                      edge="start"
-                      checked={localSelected?.includes(option.key)}
+                      // edge="start"
+                      color="primary"
+                      checked={selectedOptions?.includes(option.key)}
                       tabIndex={-1}
                       disableRipple
                     />

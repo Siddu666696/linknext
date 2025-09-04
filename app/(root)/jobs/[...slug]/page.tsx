@@ -2,18 +2,19 @@
 import JobFilter from "@/components/commonComponents/Filters/JobFilters";
 import { LocationFilter } from "@/components/commonComponents/Filters/LocationFilter";
 import JobCard from "@/components/commonComponents/JobCard";
+import JobSearchClient from "@/components/commonComponents/JobSearchClient";
 import { semanticSearchJobs } from "@/lib/api/open/queries/trial";
 import { parseSearchParams } from "@/lib/utils/commonFunctions";
 import { parseSlugToFilters } from "@/lib/utils/slugParser";
 import { Box, Grid } from "@mui/material";
 
-interface SearchFilters {
-  query: string;
+export interface SearchFilters {
+  slugQuery: string;
   filters: {
     location: string;
     education: string;
     experienceRange: { min: number; max: number };
-    skills: string;
+    skills: string[];
     specialization: string;
     salaryRange: { min: number; max: number };
     jobType: string;
@@ -27,13 +28,27 @@ interface JobSearchPageProps {
 }
 
 
-export default async function JobSearchPage({ params }: JobSearchPageProps) {
-  const { query, filters }: SearchFilters = parseSearchParams(params.searchParams || {});
+export default async function JobSearchPage({ params,searchParams }: JobSearchPageProps) {
+    const sp = new URLSearchParams();
+  for (const key in searchParams) {
+    const value = searchParams[key];
+    if (Array.isArray(value)) {
+      value.forEach((v) => sp.append(key, v));
+    } else if (value !== undefined) {
+      sp.set(key, value);
+    }
+  }
+  const {  slugQuery,filters }: SearchFilters = parseSlugToFilters(await params.slug);
   
+  const query = slugQuery||sp?.get("query") || "";
+console.log("slugQuery",slugQuery,filters,query,"searchParams",searchParams);
+   const page = parseInt(sp.get("page") as string) || 1;
+  const limit = parseInt(sp.get("limit") as string) || 10;
 
+  const offset = (page - 1) * limit;
   const data = await semanticSearchJobs({
-    limit: 10,
-    offset: 0,
+    limit: limit,
+    offset: offset,
     query,
     sortBy: "relevance",
     filters,
@@ -54,29 +69,19 @@ const aggregators = data?.sematicSearchJobs?.aggregations || {};
       <Box className="md:col-span-1 space-y-4">
         {/* <LocationFilter defaultValue={filters.location} /> */}
       </Box>
-      <Box >
+      <Box p={3}>
         {/* <h2 className="text-xl font-semibold mb-4">Job Results</h2> */}
         {/* Add JobList component here */}
-        <Grid container >
-          <Grid item md={3}>
-                                  <JobFilter allSearchQueryParameters={filters} allFilterOptions={filters} openedItemId={""} aggregators={data?.sematicSearchJobs?.aggregations} handleFilterSearchedOptions={async(filter)=>{"use server"; console.log(filter,"filter change")}}
-                                  
-                                  // handleClick={handleClick} handleClearFilter={handleClearFilter} handleFilterSearchedOptions={handleFilterSearchedOptions} searchForm={searchForm} handleCheckboxLocation={handleCheckboxLocation} form={form} handleChange={handleChange} handleBlur={handleBlur} handleRefineSearch={handleRefineSearch} handleCheckboxJobType={handleCheckboxJobType} handleCheckboxEducation={handleCheckboxEducation} handleCheckboxHospital={handleCheckboxHospital} handleCheckboxSpecialization={handleCheckboxSpecialization} handleCheckboxSkill={handleCheckboxSkill} viewAllOptions={viewAllOptions} setViewAllOptions={setViewAllOptions}  aggregators={aggregators}
-                                  />
-
-          </Grid>
-          <Grid item xs={12} md={8} lg={6} spacing={2} gap={2} height={"100vh"}>
-            {" "}
-              {jobs.map((job) => (
-                <Box key={job.vacancyID} p={2} >
-                  {/* Job details */}
-                  <JobCard jobData={job} />
-                  {/* {job.jobRole && <h3 className="text-lg font-bold">{job.jobRole}</h3>} */}
-                  {/* {job.company && <p className="text-sm text-gray-600">{job.company}</p>} */}
-                </Box>
-              ))}
-          </Grid>
-        </Grid>
+          <JobSearchClient
+                initialJobs={jobs}
+                initialAggregators={aggregators}
+                initialFilters={filters}
+                initialQuery={query}
+                 page={page}
+                limit={limit}
+                total={data?.sematicSearchJobs?.total || 0}
+              />
+    
       </Box>
     </Box>
   );

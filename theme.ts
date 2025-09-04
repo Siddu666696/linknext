@@ -161,6 +161,11 @@ components: {
                 color: "#0070B3",
                 fontWeight: 500,
             },
+            h3:{
+                fontSize:32,
+                fontWeight: 600,
+                color: "#395987"
+            },
             h4: {
                 fontSize: 18,
                 fontWeight: 500,

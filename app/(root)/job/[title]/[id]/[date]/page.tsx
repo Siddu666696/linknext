@@ -65,27 +65,109 @@ type JobDetails = {
 
 
 // Generate metadata for SEO
+// export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+//   try {
+//     const res = await getAVacancy(parseInt(params.id));
+//     const job= res?.getAVacancy as JobDetails;
+//     const title = `${job.jobRole || job.otherJobRole} job in ${job.location} | MedLink Jobs`;
+//     const description = `${job.jobRole || job.otherJobRole} position at ${job.hospitalName || ""} in ${job.location}. Apply now for this medical job opportunity.`;
+
+//     return {
+//       title,
+//       description,
+//       keywords: [
+//         job.jobRole,
+//         job.location,
+//         job.hospitalName,
+//         'medical jobs',
+//         'healthcare careers',
+//         'MedLink Jobs'
+//       ].filter(Boolean).join(', '),
+//       openGraph: {
+//         title,
+//         description,
+//         type: 'website',
+//         url: `https://www.medlinkjobs.com/job/${job.jobRole}/${job.vacancyID}/${job.postedOn}`,
+//       },
+//       robots: {
+//         index: true,
+//         follow: true,
+//         'max-snippet': -1,
+//         'max-image-preview': 'large',
+//         'max-video-preview': -1,
+//       },
+//       alternates: {
+//         canonical: `https://www.medlinkjobs.com/job/${job.vacancyID}`,
+//       },
+//     };
+//   } catch (error) {
+//     console.error('Error generating metadata:', error);
+//     return {
+//       title: 'Job Details | MedLink Jobs',
+//       description: 'Find your next medical career opportunity with MedLink Jobs.',
+//     };
+//   }
+// }
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
     const res = await getAVacancy(parseInt(params.id));
-    const job= res?.getAVacancy as JobDetails;
-
-    // // Check type of job
-    // console.log('Type of job:', typeof job);
-
-    // // Check keys of job
-    // console.log('Keys in job:', Object.keys(job));
-
-    // // Check if job has prototype
-    // console.log('Has prototype?', Object.getPrototypeOf(job));
-
-    // // Check field directly
-    // console.log('job.jobRole:', job.jobRole);
-    // console.log('job.location:', job.location);
-    // console.log('job.hospitalName:', job.hospitalName);
+    const job = res?.getAVacancy as JobDetails;
 
     const title = `${job.jobRole || job.otherJobRole} job in ${job.location} | MedLink Jobs`;
     const description = `${job.jobRole || job.otherJobRole} position at ${job.hospitalName || ""} in ${job.location}. Apply now for this medical job opportunity.`;
+    const jobUrl = `https://www.medlinkjobs.com/job/${job.jobRole}/${job.vacancyID}/${job.postedOn}`;
+    const canonicalUrl = `https://www.medlinkjobs.com/job/${job.vacancyID}`;
+    const logoUrl = job.logo || 'https://www.medlinkjobs.com/default-logo.png';
+
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'JobPosting',
+      title: job.jobRole || job.otherJobRole,
+      description: job.description,
+      identifier: {
+        '@type': 'PropertyValue',
+        name: 'MedLink Jobs',
+        value: job.vacancyID,
+      },
+      datePosted: job.postedOn,
+      validThrough: job.lastDateToApply,
+      employmentType: job.employmentType,
+      hiringOrganization: {
+        '@type': 'Organization',
+        name: job.hospitalName || 'Healthcare Organization',
+        sameAs: 'https://www.medlinkjobs.com',
+        logo: logoUrl,
+      },
+      jobLocation: {
+        '@type': 'Place',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: job.location.split(',')[0]?.trim(),
+          addressRegion: job.location.split(',')[1]?.trim(),
+          addressCountry: 'IN',
+        },
+      },
+      baseSalary: job.isSalaryDisclosed
+        ? {
+            '@type': 'MonetaryAmount',
+            currency: 'INR',
+            value: {
+              '@type': 'QuantitativeValue',
+              minValue: job.minimumSalary,
+              maxValue: job.maximumSalary,
+              unitText: 'YEAR',
+            },
+          }
+        : undefined,
+      industry: job.department,
+      qualifications: job.qualification,
+      skills: job.skill?.split(','),
+      experienceRequirements:
+        job.expMin === 0 && job.expMax === 0
+          ? 'Fresher'
+          : `${job.expMin}-${job.expMax} years experience`,
+      jobLocationType: 'Onsite',
+    };
 
     return {
       title,
@@ -102,7 +184,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         title,
         description,
         type: 'website',
-        url: `https://www.medlinkjobs.com/job/${job.jobRole}/${job.vacancyID}/${job.postedOn}`,
+        url: jobUrl,
       },
       robots: {
         index: true,
@@ -112,7 +194,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'max-video-preview': -1,
       },
       alternates: {
-        canonical: `https://www.medlinkjobs.com/job/${job.vacancyID}`,
+        canonical: canonicalUrl,
+      },
+      other: {
+        // JSON-LD structured data (for Google Job Posting)
+        'script:ld+json': JSON.stringify(structuredData),
       },
     };
   } catch (error) {
@@ -124,54 +210,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-// Data fetching function
-async function fetchJobData(vacancyId: string): Promise<object> {
-  try {
-    // Fetch primary job data
-    const [vacancyResponse, userResponse] = await Promise.all([
-      getVacancyById(vacancyId),
-    ]);
-
-    if (!vacancyResponse.success || !vacancyResponse.data) {
-      throw new Error('Job not found');
-    }
-
-    const jobDetails = vacancyResponse.data;
-    
-    // Fetch related data in parallel
-    const [
-      hospitalResponse,
-      hospitalContactResponse,
-      hospitalImagesResponse,
-      similarJobsResponse,
-    ] = await Promise.allSettled([
-      getHospitalDetails(jobDetails.hospitalName || ''),
-      getHospitalContactDetails(jobDetails.hospitalName || ''),
-      getHospitalImages(jobDetails.hospitalName || ''),
-      getSimilarVacancies(jobDetails.jobRole, jobDetails.location, 10),
-    ]);
-
-    return {
-      singleJobDetails: jobDetails,
-      hospitalDetails: hospitalResponse.status === 'fulfilled' && hospitalResponse.value.success 
-        ? hospitalResponse.value.data 
-        : null,
-      hospitalContactDetails: hospitalContactResponse.status === 'fulfilled' && hospitalContactResponse.value.success 
-        ? hospitalContactResponse.value.data 
-        : null,
-      allHospitalImages: hospitalImagesResponse.status === 'fulfilled' && hospitalImagesResponse.value.success 
-        ? hospitalImagesResponse.value.data 
-        : [],
-      vacancies: similarJobsResponse.status === 'fulfilled' && similarJobsResponse.value.success 
-        ? similarJobsResponse.value.data 
-        : [],
-      user: userResponse,
-    };
-  } catch (error) {
-    console.error('Error fetching job data:', error);
-    throw error;
-  }
-}
 
 // Main page component
 export default async function JobDetailPage({ params }: PageProps) {
@@ -196,13 +234,3 @@ export default async function JobDetailPage({ params }: PageProps) {
     notFound();
   }
 }
-
-// Generate static params for ISR (optional)
-export async function generateStaticParams() {
-  // You can implement this to pre-generate popular job pages
-  // For now, we'll use dynamic rendering
-  return [];
-}
-
-// Revalidate every 5 minutes
-export const revalidate = 300;
